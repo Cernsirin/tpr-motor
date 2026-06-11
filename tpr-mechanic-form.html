@@ -6,40 +6,43 @@
 <title>TPR Motor — บันทึกงานช่าง</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body { background: #0f0f1a; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; padding: 0 0 40px; }
-  .header { background: linear-gradient(135deg, #1a1a2e, #16213e); padding: 20px 16px 16px; text-align: center; border-bottom: 2px solid #e94560; position: sticky; top: 0; z-index: 10; }
-  .header h1 { font-size: 18px; color: #fff; font-weight: 700; }
-  .header p  { font-size: 12px; color: #aaa; margin-top: 4px; }
+  body { background: #f5f7fa; color: #1a1a2e; font-family: 'Segoe UI', sans-serif; min-height: 100vh; padding: 0 0 40px; }
+  .header { background: #fff; padding: 16px 16px 12px; text-align: center; border-bottom: 2px solid #e94560; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .header h1 { font-size: 17px; color: #1a1a2e; font-weight: 700; }
+  .header p  { font-size: 12px; color: #888; margin-top: 4px; }
   .form-wrap { padding: 20px 16px; max-width: 480px; margin: 0 auto; }
   .field { margin-bottom: 20px; }
-  label { display: block; font-size: 13px; color: #aaa; margin-bottom: 8px; font-weight: 600; }
+  label { display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; }
   label span.req { color: #e94560; margin-left: 2px; }
-  input[type="text"], select, textarea { width: 100%; background: #1e1e30; border: 1.5px solid #2e2e4a; border-radius: 10px; color: #fff; font-size: 16px; padding: 14px 16px; outline: none; transition: border-color .2s; font-family: inherit; -webkit-appearance: none; }
-  input[type="text"]:focus, select:focus, textarea:focus { border-color: #e94560; background: #23233a; }
-  select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px; }
-  select option { background: #1e1e30; color: #fff; }
-  textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
-  .photo-area { border: 2px dashed #2e2e4a; border-radius: 12px; background: #1e1e30; overflow: hidden; }
-  .photo-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px; gap: 10px; cursor: pointer; }
+  input[type="text"], select, textarea { width: 100%; background: #fff; border: 1.5px solid #e0e0e0; border-radius: 10px; color: #1a1a2e; font-size: 16px; padding: 13px 14px; outline: none; transition: border-color .2s; font-family: inherit; -webkit-appearance: none; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  input[type="text"]:focus, select:focus, textarea:focus { border-color: #e94560; box-shadow: 0 0 0 3px rgba(233,69,96,0.08); }
+  select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+  select option { background: #fff; color: #1a1a2e; }
+  textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+  .photo-area { border: 2px dashed #d0d5de; border-radius: 12px; background: #fff; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .photo-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px; gap: 8px; cursor: pointer; }
   .photo-placeholder p { color: #888; font-size: 14px; }
-  .photo-placeholder small { color: #555; font-size: 12px; }
+  .photo-placeholder small { color: #bbb; font-size: 12px; }
   #photo-preview { display: none; width: 100%; max-height: 240px; object-fit: cover; border-radius: 10px; }
   #photo-preview.visible { display: block; }
-  .photo-btns { display: flex; gap: 8px; padding: 10px; background: #16162a; }
+  .photo-btns { display: flex; gap: 8px; padding: 10px; background: #f5f7fa; border-top: 1px solid #eee; }
   .btn-photo { flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-  .btn-camera { background: #0f3460; color: #fff; }
+  .btn-camera { background: #1a1a2e; color: #fff; }
   #file-input { display: none; }
-  .btn-submit { width: 100%; padding: 16px; background: linear-gradient(135deg, #e94560, #c73652); color: #fff; border: none; border-radius: 12px; font-size: 17px; font-weight: 700; cursor: pointer; margin-top: 8px; -webkit-appearance: none; }
-  .btn-submit:disabled { opacity: 0.5; }
-  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center; flex-direction: column; gap: 16px; text-align: center; padding: 24px; }
+  .btn-submit { width: 100%; padding: 15px; background: #e94560; color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; box-shadow: 0 4px 14px rgba(233,69,96,0.3); transition: opacity .2s, transform .1s; -webkit-appearance: none; }
+  .btn-submit:active { transform: scale(0.98); opacity: 0.9; }
+  .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; flex-direction: column; gap: 16px; text-align: center; padding: 24px; }
   .overlay.active { display: flex; }
-  .overlay-icon { font-size: 56px; }
-  .overlay-title { font-size: 22px; font-weight: 700; color: #fff; }
-  .overlay-msg { font-size: 14px; color: #aaa; line-height: 1.6; }
-  .overlay-close { margin-top: 8px; padding: 12px 32px; background: #e94560; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
-  .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.2); border-top-color: #e94560; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  .overlay-box { background: #fff; border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 320px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .overlay-icon { font-size: 52px; }
+  .overlay-title { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+  .overlay-msg { font-size: 13px; color: #888; line-height: 1.6; }
+  .overlay-close { margin-top: 4px; padding: 12px 32px; background: #e94560; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .spinner { width: 40px; height: 40px; border: 4px solid #eee; border-top-color: #e94560; border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .divider { height: 1px; background: #2e2e4a; margin: 8px 0 24px; }
+  .divider { height: 1px; background: #e8ebf0; margin: 4px 0 20px; }
+  .section-label { font-size: 11px; font-weight: 700; color: #aaa; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
 </style>
 </head>
 <body>
@@ -65,23 +68,24 @@
     <input type="text" id="plate" placeholder="เช่น กข 1234 กรุงเทพมหานคร" autocomplete="off" style="text-transform:uppercase;">
   </div>
   <div class="divider"></div>
+  <div class="section-label">📷 รูปก่อนทำ</div>
   <div class="field">
-    <label>ถ่ายรูปก่อนทำ</label>
     <div class="photo-area" id="photo-area">
       <div class="photo-placeholder" id="photo-placeholder" onclick="triggerCamera()">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
         <p>แตะเพื่อถ่ายรูป</p>
         <small>หรือเลือกจากคลัง</small>
       </div>
       <img id="photo-preview" alt="รูปก่อนทำ">
       <div class="photo-btns" id="photo-btns" style="display:none;">
         <button class="btn-photo btn-camera" onclick="triggerCamera()">📷 ถ่ายอีกครั้ง</button>
-        <button class="btn-photo" style="background:#2e2e4a;color:#ccc;" onclick="removePhoto()">🗑️ ลบรูป</button>
+        <button class="btn-photo" style="background:#f0f0f0;color:#666;" onclick="removePhoto()">🗑️ ลบรูป</button>
       </div>
     </div>
     <input type="file" id="file-input" accept="image/*" capture="environment" onchange="onPhotoSelected(this)">
   </div>
   <div class="divider"></div>
+  <div class="section-label">📋 ผลการตรวจ</div>
   <div class="field">
     <label>อาการที่ตรวจพบ <span class="req">*</span></label>
     <textarea id="symptoms" rows="4" placeholder="เช่น โซ่หย่อน, น้ำมันรั่ว, ไฟเลี้ยวไม่ติด..."></textarea>
@@ -92,9 +96,9 @@
   </div>
   <button class="btn-submit" id="btn-submit" onclick="submitForm()">ส่งข้อมูล &amp; แจ้งลูกค้า</button>
 </div>
-<div class="overlay" id="overlay-loading"><div class="spinner"></div><div class="overlay-title">กำลังบันทึก...</div><div class="overlay-msg">กรุณารอสักครู่ค่ะ</div></div>
-<div class="overlay" id="overlay-success"><div class="overlay-icon">✅</div><div class="overlay-title">บันทึกสำเร็จ!</div><div class="overlay-msg" id="success-msg">บันทึกข้อมูลเรียบร้อยแล้วค่ะ</div><button class="overlay-close" onclick="resetForm()">บันทึกงานถัดไป</button></div>
-<div class="overlay" id="overlay-error"><div class="overlay-icon">❌</div><div class="overlay-title">เกิดข้อผิดพลาด</div><div class="overlay-msg" id="error-msg">กรุณาลองใหม่อีกครั้งค่ะ</div><button class="overlay-close" onclick="hideOverlays()">ลองอีกครั้ง</button></div>
+<div class="overlay" id="overlay-loading"><div class="overlay-box"><div class="spinner"></div><div class="overlay-title">กำลังบันทึก...</div><div class="overlay-msg">กรุณารอสักครู่ค่ะ</div></div></div>
+<div class="overlay" id="overlay-success"><div class="overlay-box"><div class="overlay-icon">✅</div><div class="overlay-title">บันทึกสำเร็จ!</div><div class="overlay-msg" id="success-msg">บันทึกข้อมูลเรียบร้อยแล้วค่ะ</div><button class="overlay-close" onclick="resetForm()">บันทึกงานถัดไป</button></div></div>
+<div class="overlay" id="overlay-error"><div class="overlay-box"><div class="overlay-icon">❌</div><div class="overlay-title">เกิดข้อผิดพลาด</div><div class="overlay-msg" id="error-msg">กรุณาลองใหม่อีกครั้งค่ะ</div><button class="overlay-close" onclick="hideOverlays()">ลองอีกครั้ง</button></div></div>
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwEwAcsbg4KWhXGM2g6L7NPWHP61KBVxGuT4SJgmr5gyQNT_AAe86QQIIb6EHjT4cBA/exec';
 var photoBase64 = '';
@@ -131,18 +135,18 @@ function removePhoto() {
 }
 function submitForm() {
   const mechanic = document.getElementById('mechanic').value.trim();
-  const plate    = document.getElementById('plate').value.trim();
+  const plate = document.getElementById('plate').value.trim();
   const symptoms = document.getElementById('symptoms').value.trim();
-  const recs     = document.getElementById('recommendations').value.trim();
+  const recs = document.getElementById('recommendations').value.trim();
   if (!mechanic) { alert('กรุณาเลือกชื่อช่าง'); return; }
-  if (!plate)    { alert('กรุณาใส่ทะเบียนรถ'); return; }
+  if (!plate) { alert('กรุณาใส่ทะเบียนรถ'); return; }
   if (!symptoms) { alert('กรุณาใส่อาการที่ตรวจพบ'); return; }
   document.getElementById('btn-submit').disabled = true;
   showOverlay('overlay-loading');
   fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'job', mechanic, plate: plate.toUpperCase(), symptoms, recommendations: recs, photo: photoBase64 }) })
   .then(r => r.json()).then(() => {
     hideOverlays();
-    document.getElementById('success-msg').textContent = 'บันทึกงาน ' + plate.toUpperCase() + ' เรียบร้อยแล้วค่ะ\n\nระบบจะแจ้งลูกค้าทาง LINE อัตโนมัติ';
+    document.getElementById('success-msg').textContent = 'บันทึกงาน ' + plate.toUpperCase() + ' เรียบร้อยแล้วค่ะ\nระบบจะแจ้งลูกค้าทาง LINE อัตโนมัติ';
     showOverlay('overlay-success');
   }).catch(err => {
     hideOverlays();
