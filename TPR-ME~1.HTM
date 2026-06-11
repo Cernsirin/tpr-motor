@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TPR Motor — บันทึกงานช่าง</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: #0f0f1a;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 40px;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    padding: 20px 16px 16px;
+    text-align: center;
+    border-bottom: 2px solid #e94560;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .header h1 { font-size: 18px; color: #fff; font-weight: 700; letter-spacing: 0.5px; }
+  .header p  { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+  /* ── Form wrapper ── */
+  .form-wrap { padding: 20px 16px; max-width: 480px; margin: 0 auto; }
+
+  /* ── Field group ── */
+  .field { margin-bottom: 20px; }
+  label {
+    display: block;
+    font-size: 13px;
+    color: #aaa;
+    margin-bottom: 8px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  label span.req { color: #e94560; margin-left: 2px; }
+
+  input[type="text"],
+  textarea {
+    width: 100%;
+    background: #1e1e30;
+    border: 1.5px solid #2e2e4a;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px; /* 16px prevents iOS zoom */
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color .2s;
+    font-family: inherit;
+    -webkit-appearance: none;
+  }
+  input[type="text"]:focus,
+  textarea:focus { border-color: #e94560; background: #23233a; }
+  textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+
+  /* ── Photo area ── */
+  .photo-area {
+    border: 2px dashed #2e2e4a;
+    border-radius: 12px;
+    background: #1e1e30;
+    overflow: hidden;
+    position: relative;
+  }
+  .photo-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .photo-placeholder svg { opacity: 0.5; }
+  .photo-placeholder p { color: #888; font-size: 14px; }
+  .photo-placeholder small { color: #555; font-size: 12px; }
+
+  #photo-preview {
+    display: none;
+    width: 100%;
+    max-height: 240px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  #photo-preview.visible { display: block; }
+
+  .photo-btns {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    background: #16162a;
+  }
+  .btn-photo {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: opacity .15s;
+  }
+  .btn-camera { background: #0f3460; color: #fff; }
+  .btn-retake { background: #2e2e4a; color: #ccc; display: none; }
+  .btn-retake.visible { display: flex; }
+  #file-input { display: none; }
+
+  /* ── Submit button ── */
+  .btn-submit {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #e94560, #c73652);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+    transition: opacity .2s, transform .1s;
+    -webkit-appearance: none;
+  }
+  .btn-submit:active { transform: scale(0.98); opacity: 0.9; }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── Toast / overlay ── */
+  .overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+    padding: 24px;
+  }
+  .overlay.active { display: flex; }
+  .overlay-icon { font-size: 56px; }
+  .overlay-title { font-size: 22px; font-weight: 700; color: #fff; }
+  .overlay-msg { font-size: 14px; color: #aaa; line-height: 1.6; }
+  .overlay-close {
+    margin-top: 8px;
+    padding: 12px 32px;
+    background: #e94560;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Spinner */
+  .spinner {
+    width: 40px; height: 40px;
+    border: 4px solid rgba(255,255,255,0.2);
+    border-top-color: #e94560;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* divider */
+  .divider { height: 1px; background: #2e2e4a; margin: 8px 0 24px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🔧 TPR Motor — บันทึกงานช่าง</h1>
+  <p>กรอกข้อมูลก่อนเริ่มงาน — ระบบแจ้งลูกค้าอัตโนมัติ</p>
+</div>
+
+<div class="form-wrap">
+
+  <!-- ชื่อช่าง -->
+  <div class="field">
+    <label>ชื่อช่าง <span class="req">*</span></label>
+    <input type="text" id="mechanic" placeholder="เช่น สมชาย" autocomplete="off">
+  </div>
+
+  <!-- ทะเบียนรถ -->
+  <div class="field">
+    <label>ทะเบียนรถ <span class="req">*</span></label>
+    <input type="text" id="plate" placeholder="เช่น กข 1234 กรุงเทพมหานคร"
+           autocomplete="off" style="text-transform:uppercase;">
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ถ่ายรูปก่อนทำ -->
+  <div class="field">
+    <label>ถ่ายรูปก่อนทำ</label>
+    <div class="photo-area" id="photo-area">
+      <div class="photo-placeholder" id="photo-placeholder" onclick="triggerCamera()">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5">
+          <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        <p>แตะเพื่อถ่ายรูป</p>
+        <small>หรือเลือกจากคลัง</small>
+      </div>
+      <img id="photo-preview" alt="รูปก่อนทำ">
+      <div class="photo-btns" id="photo-btns" style="display:none;">
+        <button class="btn-photo btn-camera" onclick="triggerCamera()">
+          📷 ถ่ายอีกครั้ง
+        </button>
+        <button class="btn-photo btn-retake visible" id="btn-remove" onclick="removePhoto()">
+          🗑️ ลบรูป
+        </button>
+      </div>
+    </div>
+    <input type="file" id="file-input" accept="image/*" capture="environment" onchange="onPhotoSelected(this)">
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- อาการที่ตรวจพบ -->
+  <div class="field">
+    <label>อาการที่ตรวจพบ <span class="req">*</span></label>
+    <textarea id="symptoms" rows="4"
+              placeholder="เช่น โซ่หย่อน, น้ำมันรั่วที่ฝาครอบโซ่, ไฟเลี้ยวด้านซ้ายไม่ติด..."></textarea>
+  </div>
+
+  <!-- รายการแนะนำให้เปลี่ยน -->
+  <div class="field">
+    <label>รายการแนะนำให้เปลี่ยน</label>
+    <textarea id="recommendations" rows="4"
+              placeholder="เช่น โซ่+สเตอร์ หน้า-หลัง, น้ำมันเครื่อง, หัวเทียน..."></textarea>
+  </div>
+
+  <button class="btn-submit" id="btn-submit" onclick="submitForm()">
+    ส่งข้อมูล &amp; แจ้งลูกค้า
+  </button>
+
+</div>
+
+<!-- Loading overlay -->
+<div class="overlay" id="overlay-loading">
+  <div class="spinner"></div>
+  <div class="overlay-title">กำลังบันทึก...</div>
+  <div class="overlay-msg">กรุณารอสักครู่ค่ะ</div>
+</div>
+
+<!-- Success overlay -->
+<div class="overlay" id="overlay-success">
+  <div class="overlay-icon">✅</div>
+  <div class="overlay-title">บันทึกสำเร็จ!</div>
+  <div class="overlay-msg" id="success-msg">บันทึกข้อมูลเรียบร้อยแล้วค่ะ</div>
+  <button class="overlay-close" onclick="resetForm()">บันทึกงานถัดไป</button>
+</div>
+
+<!-- Error overlay -->
+<div class="overlay" id="overlay-error">
+  <div class="overlay-icon">❌</div>
+  <div class="overlay-title">เกิดข้อผิดพลาด</div>
+  <div class="overlay-msg" id="error-msg">กรุณาลองใหม่อีกครั้งค่ะ</div>
+  <button class="overlay-close" onclick="hideOverlays()">ลองอีกครั้ง</button>
+</div>
+
+<script>
+// ── ใส่ URL ของ Apps Script Web App ที่นี่ ──────────────────
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwEwAcsbg4KWhXGM2g6L7NPWHP61KBVxGuT4SJgmr5gyQNT_AAe86QQIIb6EHjT4cBA/exec';
+
+var photoBase64 = '';
+
+// ── Camera / Photo ─────────────────────────────────────────
+
+function triggerCamera() {
+  document.getElementById('file-input').click();
+}
+
+function onPhotoSelected(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+
+  // Compress to max ~800px wide
+  const img = new Image();
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const maxW = 800;
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      photoBase64 = canvas.toDataURL('image/jpeg', 0.75);
+      showPhoto(photoBase64);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function showPhoto(src) {
+  document.getElementById('photo-placeholder').style.display = 'none';
+  const preview = document.getElementById('photo-preview');
+  preview.src = src;
+  preview.classList.add('visible');
+  document.getElementById('photo-btns').style.display = 'flex';
+}
+
+function removePhoto() {
+  photoBase64 = '';
+  document.getElementById('photo-preview').src = '';
+  document.getElementById('photo-preview').classList.remove('visible');
+  document.getElementById('photo-placeholder').style.display = 'flex';
+  document.getElementById('photo-btns').style.display = 'none';
+  document.getElementById('file-input').value = '';
+}
+
+// ── Submit ─────────────────────────────────────────────────
+
+function submitForm() {
+  const mechanic = document.getElementById('mechanic').value.trim();
+  const plate    = document.getElementById('plate').value.trim();
+  const symptoms = document.getElementById('symptoms').value.trim();
+  const recs     = document.getElementById('recommendations').value.trim();
+
+  // Validation
+  if (!mechanic) { alert('กรุณาใส่ชื่อช่าง'); return; }
+  if (!plate)    { alert('กรุณาใส่ทะเบียนรถ'); return; }
+  if (!symptoms) { alert('กรุณาใส่อาการที่ตรวจพบ'); return; }
+
+  document.getElementById('btn-submit').disabled = true;
+  showOverlay('overlay-loading');
+
+  const payload = {
+    type:            'job',
+    mechanic:        mechanic,
+    plate:           plate.toUpperCase(),
+    symptoms:        symptoms,
+    recommendations: recs,
+    photo:           photoBase64
+  };
+
+  fetch(SCRIPT_URL, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    hideOverlays();
+    var msg = 'บันทึกงาน ' + plate.toUpperCase() + ' เรียบร้อยแล้วค่ะ';
+    msg += '\n\nระบบจะแจ้งลูกค้าทาง LINE อัตโนมัติ (ถ้าลูกค้าลงทะเบียนแล้ว)';
+    document.getElementById('success-msg').textContent = msg;
+    showOverlay('overlay-success');
+  })
+  .catch(function(err) {
+    hideOverlays();
+    document.getElementById('error-msg').textContent = 'เกิดข้อผิดพลาด: ' + err.message;
+    showOverlay('overlay-error');
+    document.getElementById('btn-submit').disabled = false;
+  });
+}
+
+// ── Overlay helpers ────────────────────────────────────────
+
+function showOverlay(id) {
+  hideOverlays();
+  document.getElementById(id).classList.add('active');
+}
+
+function hideOverlays() {
+  ['overlay-loading','overlay-success','overlay-error'].forEach(function(id) {
+    document.getElementById(id).classList.remove('active');
+  });
+}
+
+function resetForm() {
+  hideOverlays();
+  document.getElementById('mechanic').value        = '';
+  document.getElementById('plate').value           = '';
+  document.getElementById('symptoms').value        = '';
+  document.getElementById('recommendations').value = '';
+  removePhoto();
+  document.getElementById('btn-submit').disabled = false;
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>

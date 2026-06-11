@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TPR Motor — ระบบจัดการ</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: #0f0f1a;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    padding: 40px 20px 32px;
+    text-align: center;
+    border-bottom: 3px solid #e94560;
+  }
+  .logo { font-size: 48px; margin-bottom: 12px; }
+  .header h1 { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: 1px; }
+  .header p  { font-size: 14px; color: #888; margin-top: 6px; }
+
+  /* ── Cards ── */
+  .cards {
+    padding: 28px 20px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 480px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 20px 18px;
+    background: #1e1e30;
+    border-radius: 14px;
+    border: 1.5px solid #2e2e4a;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .2s, background .2s, transform .1s;
+    cursor: pointer;
+  }
+  .card:active { transform: scale(0.98); }
+  .card:hover  { border-color: #e94560; background: #23233a; }
+
+  .card-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+  .icon-mechanic  { background: #0f3460; }
+  .icon-form      { background: #16213e; }
+  .icon-dashboard { background: #1a1a2e; }
+
+  .card-text {}
+  .card-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .card-desc  { font-size: 13px; color: #888; line-height: 1.4; }
+
+  .card-arrow {
+    margin-left: auto;
+    color: #444;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  /* ── Divider ── */
+  .section-title {
+    font-size: 11px;
+    color: #555;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0 4px;
+    margin-top: 8px;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: auto;
+    padding: 20px;
+    text-align: center;
+    font-size: 12px;
+    color: #444;
+    border-top: 1px solid #1e1e30;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">🏍️</div>
+  <h1>TPR Motor</h1>
+  <p>ศูนย์บริการ Yamaha — เทพารักษ์</p>
+</div>
+
+<div class="cards">
+
+  <div class="section-title">งานช่าง</div>
+
+  <a class="card" href="tpr-mechanic-form.html">
+    <div class="card-icon icon-mechanic">🔧</div>
+    <div class="card-text">
+      <div class="card-title">บันทึกงานช่าง</div>
+      <div class="card-desc">ถ่ายรูป · บันทึกอาการ · แจ้งลูกค้าทาง LINE อัตโนมัติ</div>
+    </div>
+    <div class="card-arrow">›</div>
+  </a>
+
+  <div class="section-title" style="margin-top:8px;">อะไหล่ &amp; คลังสินค้า</div>
+
+  <a class="card" href="tpr-form-v2.html">
+    <div class="card-icon icon-form">📦</div>
+    <div class="card-text">
+      <div class="card-title">แจ้งอะไหล่ / เบิกของ</div>
+      <div class="card-desc">แจ้งอะไหล่ขาด · ส่งคำขอเบิกของระหว่างสาขา</div>
+    </div>
+    <div class="card-arrow">›</div>
+  </a>
+
+  <a class="card" href="tpr-dashboard-v2.html">
+    <div class="card-icon icon-dashboard">📊</div>
+    <div class="card-text">
+      <div class="card-title">Dashboard</div>
+      <div class="card-desc">ดูสถานะอะไหล่ · อนุมัติใบเบิก · ติดตามงาน</div>
+    </div>
+    <div class="card-arrow">›</div>
+  </a>
+
+</div>
+
+<div class="footer">
+  TPR Motor Yamaha &copy; 2567 &nbsp;|&nbsp; Powered by Google Apps Script
+</div>
+
+</body>
+</html>
