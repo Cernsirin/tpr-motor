@@ -19,20 +19,23 @@
   select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
   select option { background: #fff; color: #1a1a2e; }
   textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
-  .photo-area { border: 2px dashed #d0d5de; border-radius: 12px; background: #fff; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-  .photo-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px; gap: 8px; cursor: pointer; }
-  .photo-placeholder p { color: #888; font-size: 14px; }
-  .photo-placeholder small { color: #bbb; font-size: 12px; }
-  #photo-preview { display: none; width: 100%; max-height: 240px; object-fit: cover; border-radius: 10px; }
-  #photo-preview.visible { display: block; }
-  .photo-btns { display: flex; gap: 8px; padding: 10px; background: #f5f7fa; border-top: 1px solid #eee; }
-  .btn-photo { flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-  .btn-camera { background: #1a1a2e; color: #fff; }
-  #file-input { display: none; }
+  .divider { height: 1px; background: #e8ebf0; margin: 4px 0 20px; }
+  .section-label { font-size: 11px; font-weight: 700; color: #aaa; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+  /* Photo Grid */
+  .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+  .photo-slot { aspect-ratio: 1; border: 2px dashed #d0d5de; border-radius: 10px; background: #fff; cursor: pointer; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: border-color .15s; }
+  .photo-slot:active { opacity: 0.7; }
+  .photo-slot.filled { border-style: solid; border-color: #c8d0dc; }
+  .photo-slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .add-icon { font-size: 20px; color: #ccc; }
+  .slot-num { font-size: 9px; color: #ccc; font-weight: 700; margin-top: 2px; }
+  .remove-btn { position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; background: rgba(0,0,0,0.55); color: #fff; border: none; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; z-index: 2; }
+  /* Submit */
   .btn-submit { width: 100%; padding: 15px; background: #e94560; color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; box-shadow: 0 4px 14px rgba(233,69,96,0.3); transition: opacity .2s, transform .1s; -webkit-appearance: none; }
   .btn-submit:active { transform: scale(0.98); opacity: 0.9; }
   .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
-  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; flex-direction: column; gap: 16px; text-align: center; padding: 24px; }
+  /* Overlays */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 24px; }
   .overlay.active { display: flex; }
   .overlay-box { background: #fff; border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 320px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); display: flex; flex-direction: column; align-items: center; gap: 12px; }
   .overlay-icon { font-size: 52px; }
@@ -41,126 +44,169 @@
   .overlay-close { margin-top: 4px; padding: 12px 32px; background: #e94560; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
   .spinner { width: 40px; height: 40px; border: 4px solid #eee; border-top-color: #e94560; border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .divider { height: 1px; background: #e8ebf0; margin: 4px 0 20px; }
-  .section-label { font-size: 11px; font-weight: 700; color: #aaa; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+  #file-input { display: none; }
 </style>
 </head>
 <body>
+
 <div class="header">
   <h1>🔧 TPR Motor — บันทึกงานช่าง</h1>
   <p>กรอกข้อมูลก่อนเริ่มงาน — ระบบแจ้งลูกค้าอัตโนมัติ</p>
 </div>
+
 <div class="form-wrap">
+
   <div class="field">
     <label>ชื่อช่าง <span class="req">*</span></label>
     <select id="mechanic">
       <option value="">— เลือกชื่อช่าง —</option>
-      <option value="ช่างบัญญัติ">ช่างบัญญัติ</option>
-      <option value="ช่างวุฒิชัย">ช่างวุฒิชัย</option>
-      <option value="ช่างพิชิตพล">ช่างพิชิตพล</option>
-      <option value="ช่างอานุภาพ">ช่างอานุภาพ</option>
-      <option value="ช่างกฤษฎากร">ช่างกฤษฎากร</option>
-      <option value="ช่างกฤษณะ">ช่างกฤษณะ</option>
+      <option>ช่างบัญญัติ</option>
+      <option>ช่างวุฒิชัย</option>
+      <option>ช่างพิชิตพล</option>
+      <option>ช่างอานุภาพ</option>
+      <option>ช่างกฤษฎากร</option>
+      <option>ช่างกฤษณะ</option>
     </select>
   </div>
+
   <div class="field">
     <label>ทะเบียนรถ <span class="req">*</span></label>
     <input type="text" id="plate" placeholder="เช่น กข 1234 กรุงเทพมหานคร" autocomplete="off" style="text-transform:uppercase;">
   </div>
+
   <div class="divider"></div>
-  <div class="section-label">📷 รูปก่อนทำ</div>
-  <div class="field">
-    <div class="photo-area" id="photo-area">
-      <div class="photo-placeholder" id="photo-placeholder" onclick="triggerCamera()">
-        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        <p>แตะเพื่อถ่ายรูป</p>
-        <small>หรือเลือกจากคลัง</small>
-      </div>
-      <img id="photo-preview" alt="รูปก่อนทำ">
-      <div class="photo-btns" id="photo-btns" style="display:none;">
-        <button class="btn-photo btn-camera" onclick="triggerCamera()">📷 ถ่ายอีกครั้ง</button>
-        <button class="btn-photo" style="background:#f0f0f0;color:#666;" onclick="removePhoto()">🗑️ ลบรูป</button>
-      </div>
-    </div>
-    <input type="file" id="file-input" accept="image/*" capture="environment" onchange="onPhotoSelected(this)">
+
+  <div class="section-label">📷 รูปก่อนทำ (สูงสุด 4 รูป)</div>
+  <div class="photo-grid">
+    <div class="photo-slot" id="before-0" onclick="triggerPhoto('before',0)"><span class="add-icon">📷</span><span class="slot-num">1</span></div>
+    <div class="photo-slot" id="before-1" onclick="triggerPhoto('before',1)"><span class="add-icon">📷</span><span class="slot-num">2</span></div>
+    <div class="photo-slot" id="before-2" onclick="triggerPhoto('before',2)"><span class="add-icon">📷</span><span class="slot-num">3</span></div>
+    <div class="photo-slot" id="before-3" onclick="triggerPhoto('before',3)"><span class="add-icon">📷</span><span class="slot-num">4</span></div>
   </div>
+
+  <div class="section-label">✅ รูปหลังทำ (สูงสุด 4 รูป)</div>
+  <div class="photo-grid">
+    <div class="photo-slot" id="after-0" onclick="triggerPhoto('after',0)"><span class="add-icon">📷</span><span class="slot-num">1</span></div>
+    <div class="photo-slot" id="after-1" onclick="triggerPhoto('after',1)"><span class="add-icon">📷</span><span class="slot-num">2</span></div>
+    <div class="photo-slot" id="after-2" onclick="triggerPhoto('after',2)"><span class="add-icon">📷</span><span class="slot-num">3</span></div>
+    <div class="photo-slot" id="after-3" onclick="triggerPhoto('after',3)"><span class="add-icon">📷</span><span class="slot-num">4</span></div>
+  </div>
+
   <div class="divider"></div>
-  <div class="section-label">📋 ผลการตรวจ</div>
+
   <div class="field">
     <label>อาการที่ตรวจพบ <span class="req">*</span></label>
     <textarea id="symptoms" rows="4" placeholder="เช่น โซ่หย่อน, น้ำมันรั่ว, ไฟเลี้ยวไม่ติด..."></textarea>
   </div>
+
   <div class="field">
     <label>รายการแนะนำให้เปลี่ยน</label>
     <textarea id="recommendations" rows="4" placeholder="เช่น โซ่+สเตอร์, น้ำมันเครื่อง, หัวเทียน..."></textarea>
   </div>
+
   <button class="btn-submit" id="btn-submit" onclick="submitForm()">ส่งข้อมูล &amp; แจ้งลูกค้า</button>
 </div>
+
 <div class="overlay" id="overlay-loading"><div class="overlay-box"><div class="spinner"></div><div class="overlay-title">กำลังบันทึก...</div><div class="overlay-msg">กรุณารอสักครู่ค่ะ</div></div></div>
-<div class="overlay" id="overlay-success"><div class="overlay-box"><div class="overlay-icon">✅</div><div class="overlay-title">บันทึกสำเร็จ!</div><div class="overlay-msg" id="success-msg">บันทึกข้อมูลเรียบร้อยแล้วค่ะ</div><button class="overlay-close" onclick="resetForm()">บันทึกงานถัดไป</button></div></div>
-<div class="overlay" id="overlay-error"><div class="overlay-box"><div class="overlay-icon">❌</div><div class="overlay-title">เกิดข้อผิดพลาด</div><div class="overlay-msg" id="error-msg">กรุณาลองใหม่อีกครั้งค่ะ</div><button class="overlay-close" onclick="hideOverlays()">ลองอีกครั้ง</button></div></div>
+<div class="overlay" id="overlay-success"><div class="overlay-box"><div class="overlay-icon">✅</div><div class="overlay-title">บันทึกสำเร็จ!</div><div class="overlay-msg" id="success-msg"></div><button class="overlay-close" onclick="resetForm()">บันทึกงานถัดไป</button></div></div>
+<div class="overlay" id="overlay-error"><div class="overlay-box"><div class="overlay-icon">❌</div><div class="overlay-title">เกิดข้อผิดพลาด</div><div class="overlay-msg" id="error-msg"></div><button class="overlay-close" onclick="hideOverlays()">ลองอีกครั้ง</button></div></div>
+
+<input type="file" id="file-input" accept="image/*" capture="environment" onchange="onPhotoSelected(this)">
+
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwEwAcsbg4KWhXGM2g6L7NPWHP61KBVxGuT4SJgmr5gyQNT_AAe86QQIIb6EHjT4cBA/exec';
-var photoBase64 = '';
-function triggerCamera() { document.getElementById('file-input').click(); }
+var photos = { before: [null,null,null,null], after: [null,null,null,null] };
+var activeSection = '', activeIdx = 0;
+
+function triggerPhoto(section, idx) {
+  activeSection = section; activeIdx = idx;
+  var inp = document.getElementById('file-input');
+  inp.value = ''; inp.click();
+}
+
 function onPhotoSelected(input) {
   if (!input.files || !input.files[0]) return;
-  const img = new Image(), reader = new FileReader();
+  var img = new Image(), reader = new FileReader();
   reader.onload = function(e) {
     img.onload = function() {
-      const canvas = document.createElement('canvas');
-      const maxW = 800; let w = img.width, h = img.height;
+      var canvas = document.createElement('canvas');
+      var maxW = 800, w = img.width, h = img.height;
       if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      photoBase64 = canvas.toDataURL('image/jpeg', 0.75);
-      showPhoto(photoBase64);
+      var b64 = canvas.toDataURL('image/jpeg', 0.75);
+      photos[activeSection][activeIdx] = b64;
+      renderSlot(activeSection, activeIdx, b64);
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(input.files[0]);
 }
-function showPhoto(src) {
-  document.getElementById('photo-placeholder').style.display = 'none';
-  const p = document.getElementById('photo-preview'); p.src = src; p.classList.add('visible');
-  document.getElementById('photo-btns').style.display = 'flex';
+
+function renderSlot(section, idx, b64) {
+  var slot = document.getElementById(section + '-' + idx);
+  slot.classList.add('filled');
+  var imgEl = document.createElement('img'); imgEl.src = b64;
+  var btn = document.createElement('button'); btn.className = 'remove-btn'; btn.innerHTML = '✕';
+  btn.onclick = function(e) { e.stopPropagation(); removePhoto(section, idx); };
+  slot.innerHTML = ''; slot.appendChild(imgEl); slot.appendChild(btn);
+  slot.onclick = function() { triggerPhoto(section, idx); };
 }
-function removePhoto() {
-  photoBase64 = '';
-  document.getElementById('photo-preview').src = '';
-  document.getElementById('photo-preview').classList.remove('visible');
-  document.getElementById('photo-placeholder').style.display = 'flex';
-  document.getElementById('photo-btns').style.display = 'none';
-  document.getElementById('file-input').value = '';
+
+function removePhoto(section, idx) {
+  photos[section][idx] = null;
+  var slot = document.getElementById(section + '-' + idx);
+  slot.classList.remove('filled');
+  slot.innerHTML = '<span class="add-icon">📷</span><span class="slot-num">' + (idx+1) + '</span>';
+  (function(s,i){ slot.onclick = function(){ triggerPhoto(s,i); }; })(section, idx);
 }
+
 function submitForm() {
-  const mechanic = document.getElementById('mechanic').value.trim();
-  const plate = document.getElementById('plate').value.trim();
-  const symptoms = document.getElementById('symptoms').value.trim();
-  const recs = document.getElementById('recommendations').value.trim();
+  var mechanic = document.getElementById('mechanic').value.trim();
+  var plate    = document.getElementById('plate').value.trim();
+  var symptoms = document.getElementById('symptoms').value.trim();
+  var recs     = document.getElementById('recommendations').value.trim();
   if (!mechanic) { alert('กรุณาเลือกชื่อช่าง'); return; }
-  if (!plate) { alert('กรุณาใส่ทะเบียนรถ'); return; }
+  if (!plate)    { alert('กรุณาใส่ทะเบียนรถ'); return; }
   if (!symptoms) { alert('กรุณาใส่อาการที่ตรวจพบ'); return; }
   document.getElementById('btn-submit').disabled = true;
   showOverlay('overlay-loading');
-  fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'job', mechanic, plate: plate.toUpperCase(), symptoms, recommendations: recs, photo: photoBase64 }) })
-  .then(r => r.json()).then(() => {
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({
+      type: 'job',
+      mechanic: mechanic,
+      plate: plate.toUpperCase(),
+      symptoms: symptoms,
+      recommendations: recs,
+      photosBefore: photos.before.filter(Boolean),
+      photosAfter:  photos.after.filter(Boolean)
+    })
+  })
+  .then(function() {
     hideOverlays();
     document.getElementById('success-msg').textContent = 'บันทึกงาน ' + plate.toUpperCase() + ' เรียบร้อยแล้วค่ะ\nระบบจะแจ้งลูกค้าทาง LINE อัตโนมัติ';
     showOverlay('overlay-success');
-  }).catch(err => {
+  })
+  .catch(function(err) {
     hideOverlays();
     document.getElementById('error-msg').textContent = 'เกิดข้อผิดพลาด: ' + err.message;
     showOverlay('overlay-error');
     document.getElementById('btn-submit').disabled = false;
   });
 }
+
 function showOverlay(id) { hideOverlays(); document.getElementById(id).classList.add('active'); }
-function hideOverlays() { ['overlay-loading','overlay-success','overlay-error'].forEach(id => document.getElementById(id).classList.remove('active')); }
+function hideOverlays() { ['overlay-loading','overlay-success','overlay-error'].forEach(function(id){ document.getElementById(id).classList.remove('active'); }); }
+
 function resetForm() {
   hideOverlays();
-  ['mechanic','plate','symptoms','recommendations'].forEach(id => document.getElementById(id).value = '');
-  removePhoto();
+  ['mechanic','plate','symptoms','recommendations'].forEach(function(id){ document.getElementById(id).value = ''; });
+  ['before','after'].forEach(function(s) {
+    for (var i = 0; i < 4; i++) { photos[s][i] = null; removePhoto(s, i); }
+  });
   document.getElementById('btn-submit').disabled = false;
   window.scrollTo(0, 0);
 }
