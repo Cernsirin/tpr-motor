@@ -8,150 +8,42 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; overflow: hidden; }
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #f5f7fa;
-  color: #1a1a2e;
-  display: flex; flex-direction: column;
-  height: 100vh;
-}
-
-/* ── Header ── */
-.header {
-  padding: 14px 18px 10px;
-  display: flex; align-items: center; justify-content: space-between;
-  flex-shrink: 0;
-  background: white;
-  border-bottom: 1px solid #eee;
-}
+body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; color: #1a1a2e; display: flex; flex-direction: column; height: 100vh; }
+.header { padding: 14px 18px 10px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: white; border-bottom: 1px solid #eee; }
 .logo { font-size: 15px; font-weight: 700; color: #1a1a2e; }
-.name-chip {
-  display: flex; align-items: center; gap: 6px;
-  background: #f0f2f5; border-radius: 20px;
-  padding: 6px 12px; cursor: pointer;
-  font-size: 13px; border: none; color: #1a1a2e;
-}
+.name-chip { display: flex; align-items: center; gap: 6px; background: #f0f2f5; border-radius: 20px; padding: 6px 12px; cursor: pointer; font-size: 13px; border: none; color: #1a1a2e; }
 .name-chip span { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* ── Tabs ── */
-.tabs {
-  display: flex; gap: 0;
-  border-bottom: 1px solid #eee;
-  flex-shrink: 0; padding: 0 18px;
-  background: white;
-}
-.tab {
-  padding: 10px 16px; font-size: 13px; font-weight: 600;
-  color: #aaa; border: none; background: none;
-  cursor: pointer; border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-}
+.tabs { display: flex; gap: 0; border-bottom: 1px solid #eee; flex-shrink: 0; padding: 0 18px; background: white; }
+.tab { padding: 10px 16px; font-size: 13px; font-weight: 600; color: #aaa; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
 .tab.active { color: #1a1a2e; border-bottom-color: #1a1a2e; }
-
-/* ── Main Panel ── */
 .panel { display: none; flex: 1; flex-direction: column; overflow: hidden; }
 .panel.active { display: flex; }
-
-/* ── PARTS: Scan Screen ── */
-.scan-screen {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 24px;
-}
-.scan-btn-main {
-  width: 168px; height: 168px; border-radius: 50%;
-  background: #1a1a2e;
-  border: none;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  cursor: pointer; transition: all 0.15s;
-  margin-bottom: 28px;
-  box-shadow: 0 8px 32px rgba(26,26,46,0.18);
-}
+.scan-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+.scan-btn-main { width: 168px; height: 168px; border-radius: 50%; background: #1a1a2e; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; margin-bottom: 28px; box-shadow: 0 8px 32px rgba(26,26,46,0.18); }
 .scan-btn-main:active { transform: scale(0.94); }
 .scan-btn-main .icon { font-size: 52px; line-height: 1; }
 .scan-btn-main .lbl { font-size: 13px; font-weight: 600; margin-top: 8px; color: rgba(255,255,255,0.7); }
-
-.manual-link {
-  background: none; border: none; color: #aaa;
-  font-size: 13px; cursor: pointer; padding: 8px 16px;
-  text-decoration: underline;
-}
-
-/* ── Scanner View ── */
-.scanner-view {
-  display: none; flex: 1; flex-direction: column;
-  background: #000; position: relative;
-}
+.manual-link { background: none; border: none; color: #aaa; font-size: 13px; cursor: pointer; padding: 8px 16px; text-decoration: underline; }
+.scanner-view { display: none; flex: 1; flex-direction: column; background: #000; position: relative; }
 .scanner-view.open { display: flex; }
-#qr-reader {
-  flex: 1; width: 100%; position: relative;
-}
-#qr-reader video {
-  display: block !important; visibility: visible !important;
-  width: 100% !important; height: 100% !important;
-  max-height: 100vh !important; object-fit: cover;
-  position: relative; z-index: 1;
-}
+#qr-reader { flex: 1; width: 100%; position: relative; }
+#qr-reader video { display: block !important; visibility: visible !important; width: 100% !important; height: 100% !important; max-height: 100vh !important; object-fit: cover; position: relative; z-index: 1; }
 #qr-reader * { visibility: visible !important; }
 #qr-reader img { display: none !important; }
 #qr-reader canvas { display: none !important; }
-.scan-frame {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  pointer-events: none;
-}
-.scan-frame-inner {
-  width: 240px; height: 100px;
-  border: 2px solid white;
-  border-radius: 8px;
-  box-shadow: 0 0 0 9999px rgba(0,0,0,0.45);
-}
-.scan-hint-bar {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: rgba(0,0,0,0.7); padding: 14px;
-  text-align: center; font-size: 13px; color: rgba(255,255,255,0.8);
-  display: flex; justify-content: space-between; align-items: center;
-}
-.cancel-scan {
-  background: none; border: 1px solid rgba(255,255,255,0.4);
-  color: white; padding: 6px 14px; border-radius: 20px;
-  font-size: 12px; cursor: pointer;
-}
-
-/* ── Stock Sheet (bottom sheet) ── */
-.sheet-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.6); z-index: 50;
-  align-items: flex-end;
-}
+.scan-frame { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.scan-frame-inner { width: 240px; height: 100px; border: 2px solid white; border-radius: 8px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.45); }
+.scan-hint-bar { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); padding: 14px; text-align: center; font-size: 13px; color: rgba(255,255,255,0.8); display: flex; justify-content: space-between; align-items: center; }
+.cancel-scan { background: none; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; }
+.sheet-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 50; align-items: flex-end; }
 .sheet-overlay.open { display: flex; }
-.sheet {
-  width: 100%; background: white;
-  border-radius: 20px 20px 0 0;
-  padding: 20px 18px 32px;
-  animation: slideUp 0.25s ease;
-}
+.sheet { width: 100%; background: white; border-radius: 20px 20px 0 0; padding: 20px 18px 32px; animation: slideUp 0.25s ease; }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-.sheet-part {
-  font-size: 14px; font-weight: 700; color: #1a1a2e;
-  margin-bottom: 4px; word-break: break-all;
-}
+.sheet-part { font-size: 14px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; word-break: break-all; }
 .sheet-sub { font-size: 12px; color: #aaa; margin-bottom: 20px; }
 .sheet-q { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 12px; }
-
-.stock-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 10px; margin-bottom: 14px;
-}
-.stock-opt {
-  border: none; border-radius: 14px;
-  padding: 16px 8px; cursor: pointer;
-  display: flex; flex-direction: column;
-  align-items: center; gap: 4px;
-  transition: transform 0.1s;
-}
+.stock-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+.stock-opt { border: none; border-radius: 14px; padding: 16px 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: transform 0.1s; }
 .stock-opt:active { transform: scale(0.93); }
 .stock-opt .s-num { font-size: 26px; font-weight: 800; line-height: 1; }
 .stock-opt .s-lbl { font-size: 10px; font-weight: 600; }
@@ -159,105 +51,35 @@ body {
 .stock-opt.one { background: #fff8f0; color: #c05621; }
 .stock-opt.two { background: #fffff0; color: #975a16; }
 .stock-opt.more { background: #f0fff4; color: #276749; }
-
-.sheet-cancel {
-  width: 100%; padding: 12px;
-  background: #f0f2f5; border: none;
-  border-radius: 12px; color: #888;
-  font-size: 13px; cursor: pointer;
-}
-
-/* ── Manual Input ── */
-.manual-screen {
-  display: none; flex: 1; flex-direction: column; padding: 20px 18px;
-  background: #f5f7fa;
-}
+.sheet-cancel { width: 100%; padding: 12px; background: #f0f2f5; border: none; border-radius: 12px; color: #888; font-size: 13px; cursor: pointer; }
+.manual-screen { display: none; flex: 1; flex-direction: column; padding: 20px 18px; background: #f5f7fa; }
 .manual-screen.open { display: flex; }
-.manual-title {
-  font-size: 15px; font-weight: 700; margin-bottom: 16px;
-  display: flex; align-items: center; gap: 10px;
-  color: #1a1a2e;
-}
-.back-btn {
-  background: none; border: none; color: #aaa;
-  font-size: 20px; cursor: pointer; padding: 0;
-}
-.m-input {
-  width: 100%; padding: 13px 14px;
-  background: white;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 12px; font-size: 16px;
-  color: #1a1a2e; font-family: inherit; outline: none;
-  margin-bottom: 16px;
-}
+.manual-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; color: #1a1a2e; }
+.back-btn { background: none; border: none; color: #aaa; font-size: 20px; cursor: pointer; padding: 0; }
+.m-input { width: 100%; padding: 13px 14px; background: white; border: 1.5px solid #e0e0e0; border-radius: 12px; font-size: 16px; color: #1a1a2e; font-family: inherit; outline: none; margin-bottom: 16px; }
 .m-input::placeholder { color: #bbb; }
 .m-input:focus { border-color: #1a1a2e; }
-.m-next-btn {
-  width: 100%; padding: 14px;
-  background: white; color: #1a1a2e;
-  border: none; border-radius: 12px;
-  font-size: 15px; font-weight: 700; cursor: pointer;
-}
+.m-next-btn { width: 100%; padding: 14px; background: white; color: #1a1a2e; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
 .m-next-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-/* ── Toast ── */
-.toast {
-  position: fixed; top: 50%; left: 50%;
-  transform: translate(-50%, -50%) scale(0.8);
-  background: #1a1a2e; color: white;
-  padding: 18px 28px; border-radius: 16px;
-  font-size: 16px; font-weight: 700;
-  text-align: center; z-index: 200;
-  opacity: 0; transition: all 0.2s;
-  pointer-events: none;
-}
+.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: #1a1a2e; color: white; padding: 18px 28px; border-radius: 16px; font-size: 16px; font-weight: 700; text-align: center; z-index: 200; opacity: 0; transition: all 0.2s; pointer-events: none; }
 .toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-
-/* ── Name Modal ── */
-.name-modal {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.75); z-index: 100;
-  align-items: center; justify-content: center; padding: 24px;
-}
+.name-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
 .name-modal.open { display: flex; }
-.name-box {
-  background: white; border-radius: 16px;
-  padding: 24px; width: 100%;
-}
+.name-box { background: white; border-radius: 16px; padding: 24px; width: 100%; }
 .name-box h2 { font-size: 17px; font-weight: 700; margin-bottom: 6px; color: #1a1a2e; }
 .name-box p { font-size: 13px; color: #aaa; margin-bottom: 18px; }
-.name-save {
-  width: 100%; padding: 13px;
-  background: white; color: #1a1a2e;
-  border: none; border-radius: 12px;
-  font-size: 15px; font-weight: 700; cursor: pointer;
-}
-
-/* ── REQ form (minimal dark) ── */
+.name-save { width: 100%; padding: 13px; background: white; color: #1a1a2e; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
 .req-scroll { flex: 1; overflow-y: auto; padding: 16px 18px 32px; background: #f5f7fa; }
 .f-label { font-size: 11px; font-weight: 700; color: #888; letter-spacing: 0.8px; margin-bottom: 6px; display: block; }
 .f-row { display: flex; gap: 10px; margin-bottom: 14px; }
 .f-row > * { flex: 1; }
 .f-field { margin-bottom: 14px; }
-.d-input, .d-select, .d-textarea {
-  width: 100%; padding: 12px 14px;
-  background: white;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 12px; font-size: 15px;
-  color: #1a1a2e; font-family: inherit; outline: none;
-  -webkit-appearance: none;
-}
+.d-input, .d-select, .d-textarea { width: 100%; padding: 12px 14px; background: white; border: 1.5px solid #e0e0e0; border-radius: 12px; font-size: 15px; color: #1a1a2e; font-family: inherit; outline: none; -webkit-appearance: none; }
 .d-input::placeholder, .d-textarea::placeholder { color: #bbb; }
 .d-input:focus, .d-select:focus, .d-textarea:focus { border-color: #1a1a2e; }
 .d-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
 .d-textarea { resize: none; min-height: 68px; line-height: 1.5; }
-.d-submit {
-  width: 100%; padding: 14px;
-  background: #1a1a2e; color: white;
-  border: none; border-radius: 12px;
-  font-size: 15px; font-weight: 700; cursor: pointer;
-  margin-top: 4px;
-}
+.d-submit { width: 100%; padding: 14px; background: #1a1a2e; color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 4px; }
 .d-err { font-size: 11px; color: #e53e3e; margin-top: 4px; display: none; }
 .d-err.show { display: block; }
 .d-input.inv, .d-select.inv { border-color: #e53e3e; }
@@ -270,46 +92,29 @@ body {
 </style>
 </head>
 <body>
-
-<!-- Name Modal -->
 <div class="name-modal" id="name-modal">
   <div class="name-box">
     <h2>สวัสดี! 👋</h2>
     <p>กรอกชื่อครั้งเดียว ระบบจำให้เลย</p>
-    <input class="m-input" id="name-input" placeholder="ชื่อของคุณ" maxlength="30"
-      onkeyup="if(event.key==='Enter')saveName()" />
+    <input class="m-input" id="name-input" placeholder="ชื่อของคุณ" maxlength="30" onkeyup="if(event.key==='Enter')saveName()" />
     <button class="name-save" onclick="saveName()">บันทึก →</button>
   </div>
 </div>
-
-<!-- Toast -->
 <div class="toast" id="toast"></div>
-
-<!-- Sheet Overlay -->
 <div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet(event)">
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-part" id="sheet-part-name">—</div>
     <div class="sheet-sub" id="sheet-part-sub">รหัสอะไหล่</div>
     <div class="sheet-q">เหลือในสต๊อกกี่ชิ้น?</div>
     <div class="stock-grid">
-      <button class="stock-opt zero" onclick="pickStock(0)">
-        <div class="s-num">0</div><div class="s-lbl">หมดแล้ว</div>
-      </button>
-      <button class="stock-opt one" onclick="pickStock(1)">
-        <div class="s-num">1</div><div class="s-lbl">เหลือ 1</div>
-      </button>
-      <button class="stock-opt two" onclick="pickStock(2)">
-        <div class="s-num">2</div><div class="s-lbl">เหลือ 2</div>
-      </button>
-      <button class="stock-opt more" onclick="pickStock(3)">
-        <div class="s-num">3+</div><div class="s-lbl">ใกล้หมด</div>
-      </button>
+      <button class="stock-opt zero" onclick="pickStock(0)"><div class="s-num">0</div><div class="s-lbl">หมดแล้ว</div></button>
+      <button class="stock-opt one" onclick="pickStock(1)"><div class="s-num">1</div><div class="s-lbl">เหลือ 1</div></button>
+      <button class="stock-opt two" onclick="pickStock(2)"><div class="s-num">2</div><div class="s-lbl">เหลือ 2</div></button>
+      <button class="stock-opt more" onclick="pickStock(3)"><div class="s-num">3+</div><div class="s-lbl">ใกล้หมด</div></button>
     </div>
     <button class="sheet-cancel" onclick="closeSheet()">ยกเลิก</button>
   </div>
 </div>
-
-<!-- Header -->
 <div class="header">
   <div class="logo">🔧 TPR อะไหล่</div>
   <button class="name-chip" onclick="openNameModal()" id="name-chip">
@@ -317,17 +122,11 @@ body {
     <span style="opacity:0.5; font-size:11px;">เปลี่ยน</span>
   </button>
 </div>
-
-<!-- Tabs -->
 <div class="tabs">
   <button class="tab active" id="tab-parts" onclick="switchTab('parts')">🔩 แจ้งอะไหล่</button>
   <button class="tab" id="tab-req" onclick="switchTab('req')">📦 ขอเบิกของ</button>
 </div>
-
-<!-- ══ PARTS PANEL ══ -->
 <div class="panel active" id="panel-parts">
-
-  <!-- Scan Screen -->
   <div class="scan-screen" id="scan-screen">
     <button class="scan-btn-main" onclick="startScan()">
       <div class="icon">📷</div>
@@ -335,8 +134,6 @@ body {
     </button>
     <button class="manual-link" onclick="showManual()">พิมพ์รหัสเอง</button>
   </div>
-
-  <!-- Scanner View -->
   <div class="scanner-view" id="scanner-view">
     <div id="qr-reader"></div>
     <div class="scan-frame"><div class="scan-frame-inner"></div></div>
@@ -345,8 +142,6 @@ body {
       <button class="cancel-scan" onclick="stopScan()">ยกเลิก</button>
     </div>
   </div>
-
-  <!-- Manual Input -->
   <div class="manual-screen" id="manual-screen">
     <div class="manual-title">
       <button class="back-btn" onclick="backToScan()">←</button>
@@ -355,31 +150,20 @@ body {
     <input class="m-input" id="manual-input" placeholder="เช่น 90793-40002 หรือ น้ำมันเครื่อง" autocomplete="off"
       oninput="document.getElementById('m-next').disabled=!this.value.trim()"
       onkeyup="if(event.key==='Enter' && this.value.trim()) openSheet(this.value.trim())" />
-    <button class="m-next-btn" id="m-next" onclick="openSheet(document.getElementById('manual-input').value.trim())" disabled>
-      ต่อไป →
-    </button>
+    <button class="m-next-btn" id="m-next" onclick="openSheet(document.getElementById('manual-input').value.trim())" disabled>ต่อไป →</button>
   </div>
-
 </div>
-
-<!-- ══ REQ PANEL ══ -->
 <div class="panel" id="panel-req">
   <div class="req-scroll" id="req-form-wrap">
     <div class="f-row" style="margin-top:4px">
       <div>
         <label class="f-label">สาขาของคุณ *</label>
-        <select class="d-select" id="r-from">
-          <option value="">เลือก</option>
-          <option>TPR1</option><option>TPR2</option><option>M2</option>
-        </select>
+        <select class="d-select" id="r-from"><option value="">เลือก</option><option>TPR1</option><option>TPR2</option><option>M2</option></select>
         <div class="d-err" id="e-r-from">กรุณาเลือกสาขา</div>
       </div>
       <div>
         <label class="f-label">ขอจากสาขา *</label>
-        <select class="d-select" id="r-to">
-          <option value="">เลือก</option>
-          <option>TPR1</option><option>TPR2</option>
-        </select>
+        <select class="d-select" id="r-to"><option value="">เลือก</option><option>TPR1</option><option>TPR2</option></select>
         <div class="d-err" id="e-r-to">กรุณาเลือกสาขา</div>
       </div>
     </div>
@@ -409,7 +193,6 @@ body {
     </div>
     <button class="d-submit" onclick="submitReq()">ส่งคำขอ →</button>
   </div>
-
   <div class="req-success-wrap" id="req-success-wrap" style="display:none">
     <div style="font-size:52px">📦</div>
     <h2>ส่งคำขอแล้ว!</h2>
@@ -419,96 +202,51 @@ body {
     <button class="new-g" onclick="resetReq()">+ ขอเบิกรายการใหม่</button>
   </div>
 </div>
-
 <script>
-// ── Config ──  ← ใส่ URL หลัง Deploy Apps Script
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwEwAcsbg4KWhXGM2g6L7NPWHP61KBVxGuT4SJgmr5gyQNT_AAe86QQIIb6EHjT4cBA/exec';
-
 function postToScript(data) {
-  if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL') return; // ยังไม่ได้ตั้ง URL
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).catch(() => {});
+  fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) }).catch(()=>{});
 }
-
-// ── Name ──
 let staffName = localStorage.getItem('tpr_name') || '';
-
 function init() {
-  if (!staffName) { openNameModal(); }
-  else { document.getElementById('chip-name').textContent = staffName; }
+  if (!staffName) openNameModal();
+  else document.getElementById('chip-name').textContent = staffName;
 }
-
-function openNameModal() {
-  document.getElementById('name-modal').classList.add('open');
-  setTimeout(() => document.getElementById('name-input').focus(), 100);
-}
-
+function openNameModal() { document.getElementById('name-modal').classList.add('open'); setTimeout(()=>document.getElementById('name-input').focus(),100); }
 function saveName() {
   const v = document.getElementById('name-input').value.trim();
   if (!v) return;
-  staffName = v;
-  localStorage.setItem('tpr_name', v);
+  staffName = v; localStorage.setItem('tpr_name', v);
   document.getElementById('chip-name').textContent = v;
   document.getElementById('name-modal').classList.remove('open');
 }
-
-// ── Tabs ──
 function switchTab(t) {
   ['parts','req'].forEach(x => {
     document.getElementById('tab-'+x).classList.toggle('active', x===t);
     document.getElementById('panel-'+x).classList.toggle('active', x===t);
   });
 }
-
-// ── Scanner ──
 let html5QrCode = null;
-let scannerReady = false;
-
 function startScan() {
   document.getElementById('scan-screen').style.display = 'none';
   document.getElementById('scanner-view').classList.add('open');
-
   html5QrCode = new Html5Qrcode('qr-reader');
   html5QrCode.start(
-    { facingMode: 'environment' },
-    { fps: 15, qrbox: { width: 260, height: 110 },
-      formatsToSupport: [
-        Html5QrcodeSupportedFormats.CODE_128,
-        Html5QrcodeSupportedFormats.CODE_39,
-        Html5QrcodeSupportedFormats.EAN_13,
-        Html5QrcodeSupportedFormats.EAN_8,
-        Html5QrcodeSupportedFormats.UPC_A,
-        Html5QrcodeSupportedFormats.ITF,
-      ]
-    },
+    { facingMode:'environment' },
+    { fps:15, qrbox:{width:260,height:110}, formatsToSupport:[Html5QrcodeSupportedFormats.CODE_128,Html5QrcodeSupportedFormats.CODE_39,Html5QrcodeSupportedFormats.EAN_13,Html5QrcodeSupportedFormats.EAN_8,Html5QrcodeSupportedFormats.UPC_A,Html5QrcodeSupportedFormats.ITF] },
     (decoded) => { stopScan(); openSheet(decoded); },
     () => {}
-  ).catch(() => {
-    alert('ไม่สามารถเปิดกล้องได้\nกรุณาอนุญาตการใช้กล้องในเบราว์เซอร์');
-    stopScan();
-  });
+  ).catch(() => { alert('ไม่สามารถเปิดกล้องได้\nกรุณาอนุญาตการใช้กล้องในเบราว์เซอร์'); stopScan(); });
 }
-
 function stopScan() {
-  if (html5QrCode) {
-    html5QrCode.stop().catch(()=>{}).finally(() => {
-      html5QrCode.clear();
-      html5QrCode = null;
-    });
-  }
+  if (html5QrCode) { html5QrCode.stop().catch(()=>{}).finally(()=>{ html5QrCode.clear(); html5QrCode=null; }); }
   document.getElementById('scanner-view').classList.remove('open');
   document.getElementById('scan-screen').style.display = '';
 }
-
-// ── Manual ──
 function showManual() {
   document.getElementById('scan-screen').style.display = 'none';
   document.getElementById('manual-screen').classList.add('open');
-  setTimeout(() => document.getElementById('manual-input').focus(), 100);
+  setTimeout(()=>document.getElementById('manual-input').focus(),100);
 }
 function backToScan() {
   document.getElementById('manual-screen').classList.remove('open');
@@ -516,8 +254,6 @@ function backToScan() {
   document.getElementById('m-next').disabled = true;
   document.getElementById('scan-screen').style.display = '';
 }
-
-// ── Sheet ──
 let currentPart = '';
 function openSheet(partCode) {
   currentPart = partCode;
@@ -530,119 +266,53 @@ function closeSheet(e) {
   document.getElementById('sheet-overlay').classList.remove('open');
   currentPart = '';
 }
-
 function pickStock(qty) {
   document.getElementById('sheet-overlay').classList.remove('open');
-  const urgMap = { 0:'critical', 1:'low', 2:'low', 3:'normal' };
-  const urgLabel = { 0:'🔴 หมดแล้ว', 1:'🟡 เหลือน้อย', 2:'🟡 เหลือน้อย', 3:'🔵 ใกล้หมด' };
-  const stockVal = qty === 3 ? 3 : qty;
-
-  // ส่งข้อมูลลง Google Sheet
-  postToScript({
-    type: 'parts',
-    staff: staffName,
-    partCode: currentPart,
-    stock: stockVal,
-    urgency: urgMap[qty],
-    note: ''
-  });
-
-  showToast(qty === 0 ? '🔴 ส่งแล้ว! หมดสต๊อก' : qty <= 2 ? '🟡 ส่งแล้ว! เหลือน้อย' : '🔵 ส่งแล้ว!');
+  const urgMap = {0:'critical',1:'low',2:'low',3:'normal'};
+  postToScript({ type:'parts', staff:staffName, partCode:currentPart, stock:qty===3?3:qty, urgency:urgMap[qty], note:'' });
+  showToast(qty===0?'🔴 ส่งแล้ว! หมดสต๊อก':qty<=2?'🟡 ส่งแล้ว! เหลือน้อย':'🔵 ส่งแล้ว!');
   currentPart = '';
   if (document.getElementById('manual-screen').classList.contains('open')) backToScan();
 }
-
-// ── Toast ──
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 1800);
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1800);
 }
-
-// ── Time ──
 function now() {
   const d = new Date();
-  const dd = d.getDate().toString().padStart(2,'0');
-  const mm = (d.getMonth()+1).toString().padStart(2,'0');
-  const yy = (d.getFullYear()+543).toString().slice(-2);
-  const hh = d.getHours().toString().padStart(2,'0');
-  const min = d.getMinutes().toString().padStart(2,'0');
-  return `${dd}/${mm}/${yy} ${hh}:${min}`;
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${(d.getFullYear()+543).toString().slice(-2)} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
-
-// ── REQ ──
 function submitReq() {
-  const fields = [
-    {id:'r-from',e:'e-r-from'},{id:'r-to',e:'e-r-to'},
-    {id:'r-cat',e:'e-r-cat'},{id:'r-name',e:'e-r-name'},
-    {id:'r-qty',e:'e-r-qty',check:v=>v&&parseInt(v)>0},
-  ];
+  const fields = [{id:'r-from',e:'e-r-from'},{id:'r-to',e:'e-r-to'},{id:'r-cat',e:'e-r-cat'},{id:'r-name',e:'e-r-name'},{id:'r-qty',e:'e-r-qty',check:v=>v&&parseInt(v)>0}];
   let ok = true;
   fields.forEach(f => {
-    const el = document.getElementById(f.id);
-    const er = document.getElementById(f.e);
-    const v = el.value.trim();
-    const valid = f.check ? f.check(v) : v !== '';
-    el.classList.toggle('inv', !valid);
-    er.classList.toggle('show', !valid);
-    if (!valid) ok = false;
+    const el=document.getElementById(f.id), er=document.getElementById(f.e), v=el.value.trim(), valid=f.check?f.check(v):v!=='';
+    el.classList.toggle('inv',!valid); er.classList.toggle('show',!valid);
+    if(!valid) ok=false;
   });
-  if (!ok) return;
-
-  const from = document.getElementById('r-from').value;
-  const to = document.getElementById('r-to').value;
-  const catEl = document.getElementById('r-cat');
-  const cat = catEl.options[catEl.selectedIndex].text;
-  const name = document.getElementById('r-name').value.trim();
-  const qty = document.getElementById('r-qty').value;
-  const note = document.getElementById('r-note').value.trim();
-
-  const msg = `📦 คำขอเบิกของใหม่!
-────────────────
-👤 ${staffName}  |  ${from} → ${to}
-${cat}
-📋 ${name}  × ${qty}${note?'\n📝 '+note:''}
-────────────────
-🔔 ${to} โปรดดำเนินการ
-⏱ ${now()}`;
-
-  // ส่งข้อมูลลง Google Sheet
-  postToScript({
-    type: 'req',
-    staff: staffName,
-    fromBranch: from,
-    toBranch: to,
-    category: cat,
-    itemName: name,
-    qty: Number(qty),
-    note: note
-  });
-
+  if(!ok) return;
+  const from=document.getElementById('r-from').value, to=document.getElementById('r-to').value;
+  const catEl=document.getElementById('r-cat'), cat=catEl.options[catEl.selectedIndex].text;
+  const name=document.getElementById('r-name').value.trim(), qty=document.getElementById('r-qty').value, note=document.getElementById('r-note').value.trim();
+  const msg=`📦 คำขอเบิกของใหม่!\n────────────────\n👤 ${staffName}  |  ${from} → ${to}\n${cat}\n📋 ${name}  × ${qty}${note?'\n📝 '+note:''}\n────────────────\n🔔 ${to} โปรดดำเนินการ\n⏱ ${now()}`;
+  postToScript({ type:'req', staff:staffName, fromBranch:from, toBranch:to, category:cat, itemName:name, qty:Number(qty), note:note });
   document.getElementById('req-line-msg').textContent = msg;
   document.getElementById('req-form-wrap').style.display = 'none';
   document.getElementById('req-success-wrap').style.display = 'flex';
 }
-
 function copyReq() {
-  const msg = document.getElementById('req-line-msg').textContent;
-  const btn = document.getElementById('req-copy-btn');
+  const msg=document.getElementById('req-line-msg').textContent, btn=document.getElementById('req-copy-btn');
   navigator.clipboard.writeText(msg).catch(()=>{});
-  btn.textContent = '✅ คัดลอกแล้ว!';
-  setTimeout(() => btn.textContent = '📋 คัดลอกข้อความ LINE', 2500);
+  btn.textContent='✅ คัดลอกแล้ว!';
+  setTimeout(()=>btn.textContent='📋 คัดลอกข้อความ LINE',2500);
 }
-
 function resetReq() {
-  ['r-from','r-to','r-cat','r-name','r-qty','r-note'].forEach(id => {
-    const el = document.getElementById(id);
-    el.value = ''; el.classList.remove('inv');
-  });
-  ['e-r-from','e-r-to','e-r-cat','e-r-name','e-r-qty'].forEach(id =>
-    document.getElementById(id).classList.remove('show'));
-  document.getElementById('req-form-wrap').style.display = '';
-  document.getElementById('req-success-wrap').style.display = 'none';
+  ['r-from','r-to','r-cat','r-name','r-qty','r-note'].forEach(id=>{const el=document.getElementById(id);el.value='';el.classList.remove('inv');});
+  ['e-r-from','e-r-to','e-r-cat','e-r-name','e-r-qty'].forEach(id=>document.getElementById(id).classList.remove('show'));
+  document.getElementById('req-form-wrap').style.display='';
+  document.getElementById('req-success-wrap').style.display='none';
 }
-
 init();
 </script>
 </body>
