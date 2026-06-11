@@ -85,11 +85,17 @@ body {
 }
 .scanner-view.open { display: flex; }
 #qr-reader {
-  flex: 1;
-  width: 100%;
+  flex: 1; width: 100%; position: relative;
 }
-#qr-reader video { width: 100% !important; height: 100% !important; object-fit: cover; }
+#qr-reader video {
+  display: block !important; visibility: visible !important;
+  width: 100% !important; height: 100% !important;
+  max-height: 100vh !important; object-fit: cover;
+  position: relative; z-index: 1;
+}
+#qr-reader * { visibility: visible !important; }
 #qr-reader img { display: none !important; }
+#qr-reader canvas { display: none !important; }
 .scan-frame {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
