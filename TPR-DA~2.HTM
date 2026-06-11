@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TPR Dashboard – มิ้น</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a1a; }
+
+.header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white; padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+.header h1 { font-size: 17px; font-weight: 700; }
+.header .sub { font-size: 11px; opacity: 0.6; margin-top: 2px; }
+.reload-btn {
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+  color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer;
+}
+
+/* Tab Bar */
+.tab-bar {
+  display: flex; background: white;
+  border-bottom: 2px solid #eee; position: sticky; top: 57px; z-index: 99;
+}
+.tab-btn {
+  flex: 1; padding: 12px 8px; text-align: center; font-size: 14px; font-weight: 600;
+  color: #888; border: none; background: none; cursor: pointer; position: relative;
+}
+.tab-btn.active { color: #1a1a2e; }
+.tab-btn.active::after {
+  content: ''; position: absolute; bottom: -2px; left: 0; right: 0;
+  height: 2px; background: #1a1a2e;
+}
+.tab-badge {
+  display: inline-block; background: #e53e3e; color: white;
+  font-size: 10px; font-weight: 700; padding: 1px 6px;
+  border-radius: 10px; margin-left: 4px; vertical-align: middle;
+}
+
+/* Panels */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Summary Cards */
+.summary-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; padding: 14px 14px 0;
+}
+.card {
+  background: white; border-radius: 12px; padding: 12px 8px;
+  text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.card .num { font-size: 26px; font-weight: 800; line-height: 1.1; }
+.card .lbl { font-size: 11px; color: #888; margin-top: 3px; }
+.card.red .num { color: #e53e3e; }
+.card.orange .num { color: #dd6b20; }
+.card.green .num { color: #38a169; }
+.card.blue .num { color: #3182ce; }
+.card.purple .num { color: #805ad5; }
+
+/* Filter */
+.filter-bar {
+  display: flex; gap: 8px; padding: 12px 14px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-btn {
+  padding: 5px 13px; border-radius: 20px; border: 1.5px solid #ddd;
+  background: white; font-size: 12px; cursor: pointer; white-space: nowrap; color: #555;
+}
+.filter-btn.active { background: #1a1a2e; color: white; border-color: #1a1a2e; }
+
+/* Section */
+.sec-title {
+  font-size: 13px; font-weight: 700; color: #444;
+  padding: 4px 14px 8px; display: flex; align-items: center; gap: 5px;
+}
+.parts-list { padding: 0 14px; }
+
+/* Part Item */
+.part-item {
+  background: white; border-radius: 10px; padding: 11px 12px;
+  margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  display: flex; align-items: center; gap: 10px;
+}
+.part-item.done { opacity: 0.4; }
+.dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.dot.critical { background: #e53e3e; box-shadow: 0 0 0 3px rgba(229,62,62,0.2); }
+.dot.low { background: #dd6b20; }
+.dot.normal { background: #3182ce; }
+.dot.pending_r { background: #805ad5; box-shadow: 0 0 0 3px rgba(128,90,213,0.2); }
+.dot.approved { background: #3182ce; }
+.dot.sent { background: #dd6b20; }
+.dot.received { background: #38a169; }
+
+.part-info { flex: 1; min-width: 0; }
+.part-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.part-meta { font-size: 11px; color: #888; margin-top: 2px; }
+.badge {
+  display: inline-block; font-size: 10px; padding: 2px 7px;
+  border-radius: 10px; font-weight: 600; margin-left: 5px; vertical-align: middle;
+}
+.badge.critical { background: #fff5f5; color: #e53e3e; }
+.badge.low { background: #fffaf0; color: #c05621; }
+.badge.normal { background: #ebf8ff; color: #2b6cb0; }
+.badge.pending_r { background: #faf5ff; color: #6b46c1; }
+.badge.approved { background: #ebf8ff; color: #2b6cb0; }
+.badge.sent { background: #fffaf0; color: #c05621; }
+.badge.received { background: #f0fff4; color: #276749; }
+
+.part-qty {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 48px; margin-right: 4px;
+}
+.stock-num {
+  font-size: 18px; font-weight: 800; line-height: 1;
+}
+.stock-lbl { font-size: 10px; color: #aaa; margin-top: 1px; }
+.stock-num.zero { color: #e53e3e; }
+.stock-num.low-s { color: #dd6b20; }
+.stock-num.ok { color: #38a169; }
+.action-btn {
+  padding: 6px 11px; border-radius: 18px; border: none; font-size: 11px;
+  font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.15s;
+}
+.btn-order { background: #1a1a2e; color: white; }
+.btn-order:hover { background: #2d2d5e; }
+.btn-approve { background: #3182ce; color: white; }
+.btn-approve:hover { background: #2b6cb0; }
+.btn-sent { background: #dd6b20; color: white; }
+.btn-sent:hover { background: #c05621; }
+.btn-recv { background: #38a169; color: white; }
+.btn-recv:hover { background: #276749; }
+.btn-done { background: #c6f6d5; color: #276749; }
+
+/* Req Item — extended */
+.req-item {
+  background: white; border-radius: 10px; padding: 11px 12px;
+  margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+.req-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.req-title { flex: 1; font-size: 13px; font-weight: 700; }
+.req-body { font-size: 11px; color: #666; line-height: 1.6; }
+.req-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+
+/* Progress stepper */
+.stepper { display: flex; align-items: center; gap: 0; margin: 6px 0 4px; }
+.step {
+  display: flex; flex-direction: column; align-items: center; flex: 1;
+  font-size: 10px; color: #bbb; position: relative;
+}
+.step.done { color: #38a169; }
+.step.active { color: #1a1a2e; font-weight: 700; }
+.step-circle {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid #ddd; background: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; margin-bottom: 2px; position: relative; z-index: 1;
+}
+.step.done .step-circle { border-color: #38a169; background: #38a169; color: white; }
+.step.active .step-circle { border-color: #1a1a2e; background: #1a1a2e; color: white; }
+.step-line {
+  position: absolute; top: 10px; left: calc(50% + 10px);
+  right: calc(-50% + 10px); height: 2px; background: #ddd; z-index: 0;
+}
+.step.done .step-line { background: #38a169; }
+
+/* Chart */
+.chart-card {
+  background: white; border-radius: 12px; margin: 0 14px 14px;
+  padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.chart-wrap { position: relative; height: 200px; }
+
+.empty-state { text-align: center; padding: 30px 16px; color: #aaa; font-size: 13px; }
+.divider { height: 1px; background: #eee; margin: 4px 14px 12px; }
+.gap { height: 14px; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 20px; left: 50%;
+  transform: translateX(-50%) translateY(70px);
+  background: #1a1a2e; color: white; padding: 9px 18px;
+  border-radius: 20px; font-size: 12px; font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: transform 0.3s; z-index: 999;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div style="font-size:17px;font-weight:700;">🔧 TPR Dashboard</div>
+    <div class="sub">มิ้น · ข้อมูล mock</div>
+  </div>
+  <button class="reload-btn" onclick="reloadAll()">↻ รีเฟรช</button>
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <button class="tab-btn active" id="tab-parts" onclick="switchTab('parts')">
+    🔩 อะไหล่ <span class="tab-badge" id="badge-parts">3</span>
+  </button>
+  <button class="tab-btn" id="tab-req" onclick="switchTab('req')">
+    📦 เบิกของ <span class="tab-badge" id="badge-req">2</span>
+  </button>
+</div>
+
+<!-- ===== PANEL: อะไหล่ ===== -->
+<div class="panel active" id="panel-parts">
+  <div class="summary-grid">
+    <div class="card red"><div class="num" id="p-critical">3</div><div class="lbl">🔴 ด่วนมาก</div></div>
+    <div class="card orange"><div class="num" id="p-pending">5</div><div class="lbl">⏳ รอสั่ง</div></div>
+    <div class="card green"><div class="num" id="p-ordered">6</div><div class="lbl">✅ สั่งแล้ว</div></div>
+  </div>
+
+  <div class="filter-bar" id="parts-filter">
+    <button class="filter-btn active" onclick="filterParts('all',this)">ทุกสาขา</button>
+    <button class="filter-btn" onclick="filterParts('TPR1',this)">TPR1</button>
+    <button class="filter-btn" onclick="filterParts('TPR2',this)">TPR2</button>
+    <button class="filter-btn" onclick="filterParts('M2',this)">M2</button>
+  </div>
+
+  <div class="sec-title">⏳ รายการค้างสั่ง</div>
+  <div class="parts-list" id="parts-pending"></div>
+  <div class="gap"></div><div class="divider"></div>
+  <div class="sec-title">✅ สั่งแล้ววันนี้</div>
+  <div class="parts-list" id="parts-ordered"></div>
+  <div class="gap"></div>
+
+  <div class="sec-title">📊 อะไหล่ขาดบ่อยสุด (30 วัน)</div>
+  <div class="chart-card">
+    <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+  </div>
+</div>
+
+<!-- ===== PANEL: เบิกของ ===== -->
+<div class="panel" id="panel-req">
+  <div class="summary-grid">
+    <div class="card purple"><div class="num" id="r-waiting">2</div><div class="lbl">🟣 รออนุมัติ</div></div>
+    <div class="card blue"><div class="num" id="r-sending">1</div><div class="lbl">🔵 กำลังส่ง</div></div>
+    <div class="card green"><div class="num" id="r-done">4</div><div class="lbl">✅ รับแล้ว</div></div>
+  </div>
+
+  <div class="filter-bar" id="req-filter">
+    <button class="filter-btn active" onclick="filterReq('all',this)">ทุกคำขอ</button>
+    <button class="filter-btn" onclick="filterReq('doc',this)">📄 เอกสาร</button>
+    <button class="filter-btn" onclick="filterReq('promo',this)">🎁 ของแถม</button>
+    <button class="filter-btn" onclick="filterReq('other',this)">📦 อื่นๆ</button>
+  </div>
+
+  <div class="sec-title">🟣 รออนุมัติ / ดำเนินการ</div>
+  <div class="parts-list" id="req-active"></div>
+  <div class="gap"></div><div class="divider"></div>
+  <div class="sec-title">✅ เสร็จแล้ววันนี้</div>
+  <div class="parts-list" id="req-done"></div>
+  <div class="gap"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== CONFIG =====  ← ใส่ URL หลัง Deploy Apps Script
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwEwAcsbg4KWhXGM2g6L7NPWHP61KBVxGuT4SJgmr5gyQNT_AAe86QQIIb6EHjT4cBA/exec';
+
+function postToScript(data) {
+  if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL') return;
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).catch(() => {});
+}
+
+async function loadFromSheet(type) {
+  if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL') return null;
+  try {
+    const res = await fetch(SCRIPT_URL + '?type=' + type);
+    const json = await res.json();
+    return json.ok ? json.data : null;
+  } catch { return null; }
+}
+
+async function reloadAll() {
+  document.getElementById('lastUpdate').textContent = 'กำลังโหลด…';
+  const [partsData, reqData] = await Promise.all([
+    loadFromSheet('parts'),
+    loadFromSheet('req')
+  ]);
+
+  if (partsData) {
+    parts = partsData.map((r, i) => ({
+      id: r.id || i,
+      code: r.part_code || '',
+      name: r.part_code || '',
+      branch: r.branch || 'TPR2',
+      stock: Number(r.stock) || 0,
+      urgency: r.urgency || 'normal',
+      note: r.note || '',
+      staff: r.staff || '',
+      time: r.timestamp ? new Date(r.timestamp).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) : '',
+      ordered: String(r.ordered) === 'TRUE',
+      orderedAt: r.ordered_at ? new Date(r.ordered_at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) : ''
+    }));
+  }
+
+  if (reqData) {
+    reqs = reqData.map((r, i) => ({
+      id: r.id || i,
+      cat: r.category || 'other',
+      catLabel: r.category === 'doc' ? '📄 เอกสาร' : r.category === 'promo' ? '🎁 ของแถม' : '📦 อื่นๆ',
+      name: r.item_name || '',
+      from: r.from_branch || '',
+      to: r.to_branch || '',
+      qty: Number(r.qty) || 1,
+      note: r.note || '',
+      staff: r.staff || '',
+      time: r.timestamp ? new Date(r.timestamp).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) : '',
+      status: r.status || 'pending_r',
+      sentAt: r.sent_at ? new Date(r.sent_at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) : '',
+      receivedAt: r.received_at ? new Date(r.received_at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) : ''
+    }));
+  }
+
+  const now = new Date();
+  document.getElementById('lastUpdate').textContent = `อัปเดต: ${now.toLocaleString('th-TH',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}`;
+  renderParts(); renderReqs();
+  showToast('↻ รีเฟรชแล้ว');
+}
+
+// ===== PARTS DATA (mock — แทนที่ด้วยข้อมูลจริงเมื่อตั้ง SCRIPT_URL) =====
+let parts = [
+  { id:1, code:'90793-40002', name:'น้ำมันเครื่อง 0.8L', model:'NMAX', branch:'TPR1', stock:0, urgency:'critical', note:'ลูกค้ารอ', staff:'สมชาย', time:'09:15', ordered:false },
+  { id:2, code:'5SL-E5480-00', name:'ผ้าเบรกหน้า NMAX', model:'NMAX', branch:'M2', stock:1, urgency:'critical', note:'', staff:'กิตติ', time:'09:42', ordered:false },
+  { id:3, code:'2SJ-13440-00', name:'กรองอากาศ MIO', model:'MIO', branch:'TPR2', stock:0, urgency:'critical', note:'หมดแล้ว', staff:'วิชัย', time:'08:55', ordered:false },
+  { id:4, code:'90890-04189', name:'หัวเทียน CR7E', model:'ทั่วไป', branch:'TPR1', stock:3, urgency:'low', note:'', staff:'สมชาย', time:'10:05', ordered:false },
+  { id:5, code:'5SL-E4450-00', name:'ผ้าเบรกหลัง NMAX', model:'NMAX', branch:'TPR1', stock:2, urgency:'low', note:'', staff:'อนุ', time:'10:18', ordered:false },
+  { id:6, code:'90793-40001', name:'น้ำมันเครื่อง 1L', model:'ทั่วไป', branch:'TPR2', stock:4, urgency:'normal', note:'', staff:'วิชัย', time:'07:30', ordered:true, orderedAt:'09:00' },
+  { id:7, code:'2DP-W0045-00', name:'สายสปริงคลัทช์', model:'MIO M3', branch:'TPR1', stock:2, urgency:'normal', note:'', staff:'สมชาย', time:'07:45', ordered:true, orderedAt:'09:00' },
+  { id:8, code:'5VU-14302-00', name:'หม้อกรองน้ำมัน XMAX', model:'XMAX', branch:'M2', stock:1, urgency:'low', note:'', staff:'ธนา', time:'08:00', ordered:true, orderedAt:'09:15' },
+  { id:9, code:'18P-H3508-00', name:'โซ่ตีนตะขาบ FINO', model:'FINO', branch:'TPR2', stock:0, urgency:'normal', note:'', staff:'กิตติ', time:'08:10', ordered:true, orderedAt:'09:30' },
+  { id:10, code:'1S7-12411-00', name:'ลูกสูบ MIO', model:'MIO', branch:'M2', stock:1, urgency:'low', note:'', staff:'ธนา', time:'08:30', ordered:true, orderedAt:'10:00' },
+  { id:11, code:'5SL-E4521-00', name:'คลัทช์หน้า NMAX', model:'NMAX', branch:'TPR1', stock:3, urgency:'normal', note:'', staff:'อนุ', time:'08:20', ordered:true, orderedAt:'09:30' },
+];
+
+const urgOrd = { critical:0, low:1, normal:2 };
+const urgLbl = { critical:'ด่วนมาก', low:'เหลือน้อย', normal:'ใกล้หมด' };
+let partsBranch = 'all';
+
+function filterParts(b, btn) {
+  partsBranch = b;
+  document.querySelectorAll('#parts-filter .filter-btn').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+  renderParts();
+}
+
+function renderParts() {
+  const list = partsBranch === 'all' ? parts : parts.filter(p => p.branch === partsBranch);
+  const pending = list.filter(p => !p.ordered).sort((a,b) => urgOrd[a.urgency]-urgOrd[b.urgency]);
+  const ordered = list.filter(p => p.ordered);
+
+  document.getElementById('p-critical').textContent = parts.filter(p => !p.ordered && p.urgency==='critical').length;
+  document.getElementById('p-pending').textContent = parts.filter(p => !p.ordered).length;
+  document.getElementById('p-ordered').textContent = parts.filter(p => p.ordered).length;
+  document.getElementById('badge-parts').textContent = parts.filter(p => !p.ordered && p.urgency==='critical').length;
+
+  function stockClass(s) { return s === 0 ? 'zero' : s <= 2 ? 'low-s' : 'ok'; }
+  function stockTag(s) { return `<div class="part-qty"><div class="stock-num ${stockClass(s)}">${s}</div><div class="stock-lbl">ในสต๊อก</div></div>`; }
+
+  const pe = document.getElementById('parts-pending');
+  pe.innerHTML = pending.length ? pending.map(p => `
+    <div class="part-item" id="pi-${p.id}">
+      <div class="dot ${p.urgency}"></div>
+      <div class="part-info">
+        <div class="part-name">${p.name}<span class="badge ${p.urgency}">${urgLbl[p.urgency]}</span></div>
+        <div class="part-meta">${p.code} · ${p.branch} · ${p.staff} ${p.time}${p.note?' · '+p.note:''}</div>
+      </div>
+      ${stockTag(p.stock)}
+      <button class="action-btn btn-order" onclick="markPartOrdered(${p.id})">สั่งแล้ว ✓</button>
+    </div>`).join('') : '<div class="empty-state">🎉 ไม่มีรายการค้างสั่ง</div>';
+
+  document.getElementById('parts-ordered').innerHTML = ordered.length ? ordered.map(p => `
+    <div class="part-item done">
+      <div class="dot normal"></div>
+      <div class="part-info">
+        <div class="part-name">${p.name}</div>
+        <div class="part-meta">${p.code} · ${p.branch} · สั่ง ${p.orderedAt} น.</div>
+      </div>
+      ${stockTag(p.stock)}
+      <button class="action-btn btn-done">✅ สั่งแล้ว</button>
+    </div>`).join('') : '<div class="empty-state">ยังไม่มีรายการสั่งวันนี้</div>';
+}
+
+function markPartOrdered(id) {
+  const p = parts.find(x => x.id===id);
+  const n = new Date();
+  p.ordered = true;
+  p.orderedAt = `${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}`;
+  postToScript({ type:'update', dataType:'parts', id: p.id });
+  renderParts();
+  showToast(`✅ ${p.name} – บันทึกสั่งแล้ว`);
+}
+
+// ===== REQUISITION DATA =====
+// status: pending_r → approved → sent → received
+let reqs = [
+  { id:1, cat:'doc', catLabel:'📄 เอกสาร', name:'บิลขายรถ (ชุด)', from:'TPR2', to:'TPR1', qty:50, note:'ลูกค้ารอ รถส่งพรุ่งนี้', staff:'มาลี', time:'09:00', status:'pending_r' },
+  { id:2, cat:'promo', catLabel:'🎁 ของแถม', name:'หมวกกันน็อค + เสื้อแจ็กเก็ต', from:'M2', to:'TPR1', qty:3, note:'ลูกค้า 3 คน รอรับ', staff:'ป้อม', time:'09:30', status:'pending_r' },
+  { id:3, cat:'promo', catLabel:'🎁 ของแถม', name:'เสื้อแจ็กเก็ต Yamaha', from:'TPR2', to:'TPR1', qty:2, note:'', staff:'วิชัย', time:'08:00', status:'sent', sentAt:'10:00' },
+  { id:4, cat:'doc', catLabel:'📄 เอกสาร', name:'ใบโอนกรรมสิทธิ์', from:'M2', to:'TPR2', qty:5, note:'', staff:'ธนา', time:'07:30', status:'received', receivedAt:'09:45' },
+  { id:5, cat:'other', catLabel:'📦 อื่นๆ', name:'แท่นวางโทรศัพท์ USB', from:'TPR2', to:'TPR1', qty:4, note:'', staff:'มาลี', time:'07:00', status:'received', receivedAt:'09:00' },
+  { id:6, cat:'promo', catLabel:'🎁 ของแถม', name:'หมวกกันน็อค NMAX', from:'M2', to:'TPR1', qty:1, note:'', staff:'ป้อม', time:'08:15', status:'received', receivedAt:'10:15' },
+  { id:7, cat:'doc', catLabel:'📄 เอกสาร', name:'สัญญาเช่าซื้อ', from:'M2', to:'TPR1', qty:10, note:'', staff:'ธนา', time:'08:45', status:'received', receivedAt:'10:30' },
+];
+
+const statusFlow = { pending_r:0, approved:1, sent:2, received:3 };
+const statusLabel = { pending_r:'รออนุมัติ', approved:'อนุมัติแล้ว', sent:'ส่งแล้ว', received:'รับแล้ว' };
+let reqCat = 'all';
+
+function filterReq(c, btn) {
+  reqCat = c;
+  document.querySelectorAll('#req-filter .filter-btn').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+  renderReqs();
+}
+
+function stepperHTML(status) {
+  const steps = ['pending_r','approved','sent','received'];
+  const icons = ['📋','✅','🚚','📬'];
+  const labels = ['ขอ','อนุมัติ','ส่ง','รับ'];
+  const cur = statusFlow[status];
+  return `<div class="stepper">${steps.map((s,i) => `
+    <div class="step ${i<cur?'done':i===cur?'active':''}">
+      ${i < steps.length-1 ? `<div class="step-line ${i<cur?'done':''}"></div>` : ''}
+      <div class="step-circle">${i<=cur ? (i<cur?'✓':icons[i]) : icons[i]}</div>
+      <div>${labels[i]}</div>
+    </div>`).join('')}</div>`;
+}
+
+function nextAction(req) {
+  if (req.status === 'pending_r') return `<button class="action-btn btn-approve" onclick="advanceReq(${req.id},'approved')">อนุมัติ ✓</button>`;
+  if (req.status === 'approved') return `<button class="action-btn btn-sent" onclick="advanceReq(${req.id},'sent')">ส่งแล้ว 🚚</button>`;
+  if (req.status === 'sent') return `<button class="action-btn btn-recv" onclick="advanceReq(${req.id},'received')">รับแล้ว 📬</button>`;
+  return `<button class="action-btn btn-done">✅ เสร็จแล้ว</button>`;
+}
+
+function renderReqs() {
+  const list = reqCat === 'all' ? reqs : reqs.filter(r => r.cat === reqCat);
+  const active = list.filter(r => r.status !== 'received').sort((a,b) => statusFlow[a.status]-statusFlow[b.status]);
+  const done = list.filter(r => r.status === 'received');
+
+  document.getElementById('r-waiting').textContent = reqs.filter(r => r.status==='pending_r').length;
+  document.getElementById('r-sending').textContent = reqs.filter(r => r.status==='approved'||r.status==='sent').length;
+  document.getElementById('r-done').textContent = reqs.filter(r => r.status==='received').length;
+  document.getElementById('badge-req').textContent = reqs.filter(r => r.status==='pending_r').length;
+
+  document.getElementById('req-active').innerHTML = active.length ? active.map(r => `
+    <div class="req-item" id="ri-${r.id}">
+      <div class="req-top">
+        <div class="dot ${r.status}"></div>
+        <div class="req-title">${r.name}<span class="badge ${r.status}">${statusLabel[r.status]}</span></div>
+        <span style="font-size:11px;color:#888">${r.catLabel}</span>
+      </div>
+      ${stepperHTML(r.status)}
+      <div class="req-body">
+        <b>${r.from}</b> ขอจาก <b>${r.to}</b> · จำนวน ${r.qty} · ${r.staff} ${r.time}
+        ${r.note ? `<br>📝 ${r.note}` : ''}
+      </div>
+      <div class="req-actions">${nextAction(r)}</div>
+    </div>`).join('') : '<div class="empty-state">🎉 ไม่มีรายการรอดำเนินการ</div>';
+
+  document.getElementById('req-done').innerHTML = done.length ? done.map(r => `
+    <div class="req-item" style="opacity:0.45">
+      <div class="req-top">
+        <div class="dot received"></div>
+        <div class="req-title">${r.name}<span class="badge received">รับแล้ว</span></div>
+        <span style="font-size:11px;color:#888">${r.catLabel}</span>
+      </div>
+      <div class="req-body">${r.from} → ${r.to} · รับ ${r.receivedAt} น.</div>
+    </div>`).join('') : '<div class="empty-state">ยังไม่มีรายการเสร็จวันนี้</div>';
+}
+
+function advanceReq(id, newStatus) {
+  const r = reqs.find(x => x.id===id);
+  r.status = newStatus;
+  if (newStatus==='sent') r.sentAt = now();
+  if (newStatus==='received') r.receivedAt = now();
+  postToScript({ type:'update', dataType:'req', id: r.id, status: newStatus });
+  renderReqs();
+  const msgs = { approved:`✅ อนุมัติ: ${r.name}`, sent:`🚚 ส่งแล้ว: ${r.name}`, received:`📬 รับแล้ว: ${r.name}` };
+  showToast(msgs[newStatus]);
+}
+
+function now() {
+  const d = new Date();
+  return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+}
+
+// ===== TAB =====
+function switchTab(t) {
+  ['parts','req'].forEach(x => {
+    document.getElementById('tab-'+x).classList.toggle('active', x===t);
+    document.getElementById('panel-'+x).classList.toggle('active', x===t);
+  });
+}
+
+// ===== CHART =====
+function renderChart() {
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  const data = [
+    {name:'น้ำมันเครื่อง 0.8L',c:18},{name:'ผ้าเบรกหน้า NMAX',c:14},
+    {name:'หัวเทียน CR7E',c:12},{name:'กรองอากาศ MIO',c:11},
+    {name:'น้ำมันเครื่อง 1L',c:9},{name:'ผ้าเบรกหลัง NMAX',c:8},
+    {name:'โซ่ตีนตะขาบ FINO',c:7},{name:'คลัทช์หน้า NMAX',c:6},
+    {name:'หม้อกรองน้ำมัน XMAX',c:5},{name:'ลูกสูบ MIO',c:4},
+  ];
+  new Chart(ctx, {
+    type:'bar',
+    data: {
+      labels: data.map(d => d.name.length>14 ? d.name.slice(0,14)+'…' : d.name),
+      datasets:[{ data:data.map(d=>d.c), backgroundColor: data.map((_,i)=>i<3?'#e53e3e':i<6?'#dd6b20':'#3182ce'), borderRadius:4, borderSkipped:false }]
+    },
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>` ${c.raw} ครั้ง`}} },
+      scales:{ x:{grid:{color:'#f5f5f5'},ticks:{font:{size:10}}}, y:{grid:{display:false},ticks:{font:{size:10}}} }
+    }
+  });
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+renderParts();
+renderReqs();
+renderChart();
+</script>
+</body>
+</html>
