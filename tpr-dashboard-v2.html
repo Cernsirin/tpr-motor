@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TPR Dashboard – มิ้น</title>
+<title>TPR Dashboard â à¸¡à¸´à¹à¸</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -138,8 +138,28 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a1a;
 .btn-recv { background: #38a169; color: white; }
 .btn-recv:hover { background: #276749; }
 .btn-done { background: #c6f6d5; color: #276749; }
+.btn-quote { background: #805ad5; color: white; }
+.btn-quote:hover { background: #6b46c1; }
+.btn-pay { background: #38a169; color: white; }
+.btn-pay:hover { background: #276749; }
 
-/* Req Item — extended */
+/* Job Items */
+.job-item {
+  background: white; border-radius: 10px; padding: 12px;
+  margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+.job-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.job-plate { font-size: 16px; font-weight: 800; }
+.job-body { font-size: 11px; color: #666; line-height: 1.7; }
+.job-actions { display: flex; gap: 6px; margin-top: 8px; }
+.dot.job-pending { background: #dd6b20; box-shadow: 0 0 0 3px rgba(221,107,32,0.2); }
+.dot.job-quoted  { background: #3182ce; box-shadow: 0 0 0 3px rgba(49,130,206,0.2); }
+.dot.job-paid    { background: #38a169; }
+.badge.job-pending { background: #fffaf0; color: #c05621; }
+.badge.job-quoted  { background: #ebf8ff; color: #2b6cb0; }
+.badge.job-paid    { background: #f0fff4; color: #276749; }
+
+/* Req Item â extended */
 .req-item {
   background: white; border-radius: 10px; padding: 11px 12px;
   margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.07);
@@ -198,77 +218,98 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a1a;
 
 <div class="header">
   <div>
-    <div style="font-size:17px;font-weight:700;">🔧 TPR Dashboard</div>
-    <div class="sub">มิ้น · ข้อมูล mock</div>
+    <div style="font-size:17px;font-weight:700;">ð§ TPR Dashboard</div>
+    <div class="sub" id="lastUpdate">à¸¡à¸´à¹à¸ Â· à¸­à¸±à¸à¹à¸à¸à¸¥à¹à¸²à¸ªà¸¸à¸â¦</div>
   </div>
-  <button class="reload-btn" onclick="reloadAll()">↻ รีเฟรช</button>
+  <button class="reload-btn" onclick="reloadAll()">â» à¸£à¸µà¹à¸à¸£à¸</button>
 </div>
 
 <!-- Tab Bar -->
 <div class="tab-bar">
   <button class="tab-btn active" id="tab-parts" onclick="switchTab('parts')">
-    🔩 อะไหล่ <span class="tab-badge" id="badge-parts">3</span>
+    ð© à¸­à¸°à¹à¸«à¸¥à¹ <span class="tab-badge" id="badge-parts">3</span>
   </button>
   <button class="tab-btn" id="tab-req" onclick="switchTab('req')">
-    📦 เบิกของ <span class="tab-badge" id="badge-req">2</span>
+    ð¦ à¹à¸à¸´à¸à¸à¸­à¸ <span class="tab-badge" id="badge-req">2</span>
+  </button>
+  <button class="tab-btn" id="tab-jobs" onclick="switchTab('jobs')">
+    ð§ à¸à¸²à¸à¸à¹à¸²à¸ <span class="tab-badge" id="badge-jobs" style="display:none">0</span>
   </button>
 </div>
 
-<!-- ===== PANEL: อะไหล่ ===== -->
+<!-- ===== PANEL: à¸­à¸°à¹à¸«à¸¥à¹ ===== -->
 <div class="panel active" id="panel-parts">
   <div class="summary-grid">
-    <div class="card red"><div class="num" id="p-critical">3</div><div class="lbl">🔴 ด่วนมาก</div></div>
-    <div class="card orange"><div class="num" id="p-pending">5</div><div class="lbl">⏳ รอสั่ง</div></div>
-    <div class="card green"><div class="num" id="p-ordered">6</div><div class="lbl">✅ สั่งแล้ว</div></div>
+    <div class="card red"><div class="num" id="p-critical">3</div><div class="lbl">ð´ à¸à¹à¸§à¸à¸¡à¸²à¸</div></div>
+    <div class="card orange"><div class="num" id="p-pending">5</div><div class="lbl">â³ à¸£à¸­à¸ªà¸±à¹à¸</div></div>
+    <div class="card green"><div class="num" id="p-ordered">6</div><div class="lbl">â à¸ªà¸±à¹à¸à¹à¸¥à¹à¸§</div></div>
   </div>
 
   <div class="filter-bar" id="parts-filter">
-    <button class="filter-btn active" onclick="filterParts('all',this)">ทุกสาขา</button>
+    <button class="filter-btn active" onclick="filterParts('all',this)">à¸à¸¸à¸à¸ªà¸²à¸à¸²</button>
     <button class="filter-btn" onclick="filterParts('TPR1',this)">TPR1</button>
     <button class="filter-btn" onclick="filterParts('TPR2',this)">TPR2</button>
     <button class="filter-btn" onclick="filterParts('M2',this)">M2</button>
   </div>
 
-  <div class="sec-title">⏳ รายการค้างสั่ง</div>
+  <div class="sec-title">â³ à¸£à¸²à¸¢à¸à¸²à¸£à¸à¹à¸²à¸à¸ªà¸±à¹à¸</div>
   <div class="parts-list" id="parts-pending"></div>
   <div class="gap"></div><div class="divider"></div>
-  <div class="sec-title">✅ สั่งแล้ววันนี้</div>
+  <div class="sec-title">â à¸ªà¸±à¹à¸à¹à¸¥à¹à¸§à¸§à¸±à¸à¸à¸µà¹</div>
   <div class="parts-list" id="parts-ordered"></div>
   <div class="gap"></div>
 
-  <div class="sec-title">📊 อะไหล่ขาดบ่อยสุด (30 วัน)</div>
+  <div class="sec-title">ð à¸­à¸°à¹à¸«à¸¥à¹à¸à¸²à¸à¸à¹à¸­à¸¢à¸ªà¸¸à¸ (30 à¸§à¸±à¸)</div>
   <div class="chart-card">
     <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
   </div>
 </div>
 
-<!-- ===== PANEL: เบิกของ ===== -->
+<!-- ===== PANEL: à¹à¸à¸´à¸à¸à¸­à¸ ===== -->
 <div class="panel" id="panel-req">
   <div class="summary-grid">
-    <div class="card purple"><div class="num" id="r-waiting">2</div><div class="lbl">🟣 รออนุมัติ</div></div>
-    <div class="card blue"><div class="num" id="r-sending">1</div><div class="lbl">🔵 กำลังส่ง</div></div>
-    <div class="card green"><div class="num" id="r-done">4</div><div class="lbl">✅ รับแล้ว</div></div>
+    <div class="card purple"><div class="num" id="r-waiting">2</div><div class="lbl">ð£ à¸£à¸­à¸­à¸à¸¸à¸¡à¸±à¸à¸´</div></div>
+    <div class="card blue"><div class="num" id="r-sending">1</div><div class="lbl">ðµ à¸à¸³à¸¥à¸±à¸à¸ªà¹à¸</div></div>
+    <div class="card green"><div class="num" id="r-done">4</div><div class="lbl">â à¸£à¸±à¸à¹à¸¥à¹à¸§</div></div>
   </div>
 
   <div class="filter-bar" id="req-filter">
-    <button class="filter-btn active" onclick="filterReq('all',this)">ทุกคำขอ</button>
-    <button class="filter-btn" onclick="filterReq('doc',this)">📄 เอกสาร</button>
-    <button class="filter-btn" onclick="filterReq('promo',this)">🎁 ของแถม</button>
-    <button class="filter-btn" onclick="filterReq('other',this)">📦 อื่นๆ</button>
+    <button class="filter-btn active" onclick="filterReq('all',this)">à¸à¸¸à¸à¸à¸³à¸à¸­</button>
+    <button class="filter-btn" onclick="filterReq('doc',this)">ð à¹à¸­à¸à¸ªà¸²à¸£</button>
+    <button class="filter-btn" onclick="filterReq('promo',this)">ð à¸à¸­à¸à¹à¸à¸¡</button>
+    <button class="filter-btn" onclick="filterReq('other',this)">ð¦ à¸­à¸·à¹à¸à¹</button>
   </div>
 
-  <div class="sec-title">🟣 รออนุมัติ / ดำเนินการ</div>
+  <div class="sec-title">ð£ à¸£à¸­à¸­à¸à¸¸à¸¡à¸±à¸à¸´ / à¸à¸³à¹à¸à¸´à¸à¸à¸²à¸£</div>
   <div class="parts-list" id="req-active"></div>
   <div class="gap"></div><div class="divider"></div>
-  <div class="sec-title">✅ เสร็จแล้ววันนี้</div>
+  <div class="sec-title">â à¹à¸ªà¸£à¹à¸à¹à¸¥à¹à¸§à¸§à¸±à¸à¸à¸µà¹</div>
   <div class="parts-list" id="req-done"></div>
+  <div class="gap"></div>
+</div>
+
+<!-- ===== PANEL: à¸à¸²à¸à¸à¹à¸²à¸ ===== -->
+<div class="panel" id="panel-jobs">
+  <div class="summary-grid">
+    <div class="card orange"><div class="num" id="j-pending">â</div><div class="lbl">â³ à¸£à¸­à¹à¸à¹à¸ªà¸à¸­</div></div>
+    <div class="card blue"><div class="num" id="j-quoted">â</div><div class="lbl">ð à¸£à¸­à¸à¸³à¸£à¸°</div></div>
+    <div class="card green"><div class="num" id="j-paid">â</div><div class="lbl">ð° à¸à¸³à¸£à¸°à¹à¸¥à¹à¸§</div></div>
+  </div>
+  <div class="sec-title">â³ à¸£à¸­à¹à¸à¹à¸ªà¸à¸­à¸£à¸²à¸à¸²</div>
+  <div class="parts-list" id="jobs-pending"><div class="empty-state">à¸à¸³à¸¥à¸±à¸à¹à¸«à¸¥à¸â¦</div></div>
+  <div class="gap"></div><div class="divider"></div>
+  <div class="sec-title">ð à¸ªà¹à¸à¹à¸à¹à¸ªà¸à¸­à¹à¸¥à¹à¸§ â à¸£à¸­à¸¥à¸¹à¸à¸à¹à¸²à¹à¸­à¸</div>
+  <div class="parts-list" id="jobs-quoted"></div>
+  <div class="gap"></div><div class="divider"></div>
+  <div class="sec-title">â à¸à¸³à¸£à¸°à¹à¸¥à¹à¸§</div>
+  <div class="parts-list" id="jobs-paid"></div>
   <div class="gap"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ===== CONFIG =====  ← ใส่ URL หลัง Deploy Apps Script
+// ===== CONFIG =====  â à¹à¸ªà¹ URL à¸«à¸¥à¸±à¸ Deploy Apps Script
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwEwAcsbg4KWhXGM2g6L7NPWHP61KBVxGuT4SJgmr5gyQNT_AAe86QQIIb6EHjT4cBA/exec';
 
 function postToScript(data) {
@@ -290,10 +331,11 @@ async function loadFromSheet(type) {
 }
 
 async function reloadAll() {
-  document.getElementById('lastUpdate').textContent = 'กำลังโหลด…';
-  const [partsData, reqData] = await Promise.all([
+  document.getElementById('lastUpdate').textContent = 'à¸à¸³à¸¥à¸±à¸à¹à¸«à¸¥à¸â¦';
+  const [partsData, reqData, jobsData] = await Promise.all([
     loadFromSheet('parts'),
-    loadFromSheet('req')
+    loadFromSheet('req'),
+    loadFromSheet('jobs')
   ]);
 
   if (partsData) {
@@ -316,7 +358,7 @@ async function reloadAll() {
     reqs = reqData.map((r, i) => ({
       id: r.id || i,
       cat: r.category || 'other',
-      catLabel: r.category === 'doc' ? '📄 เอกสาร' : r.category === 'promo' ? '🎁 ของแถม' : '📦 อื่นๆ',
+      catLabel: r.category === 'doc' ? 'ð à¹à¸­à¸à¸ªà¸²à¸£' : r.category === 'promo' ? 'ð à¸à¸­à¸à¹à¸à¸¡' : 'ð¦ à¸­à¸·à¹à¸à¹',
       name: r.item_name || '',
       from: r.from_branch || '',
       to: r.to_branch || '',
@@ -330,29 +372,118 @@ async function reloadAll() {
     }));
   }
 
+  if (jobsData) {
+    jobs = jobsData.map((r, i) => ({
+      id: r.id || String(i),
+      plate: r.plate || '',
+      mechanic: r.mechanic || '',
+      symptoms: r.symptoms || '',
+      recommendations: r.recommendations || '',
+      customerName: r.customer_name || '-',
+      customerPhone: r.customer_phone || '-',
+      time: r.timestamp ? new Date(r.timestamp).toLocaleString('th-TH',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '',
+      quoteStatus: r.quote_status || 'pending',
+    }));
+  }
+
   const now = new Date();
-  document.getElementById('lastUpdate').textContent = `อัปเดต: ${now.toLocaleString('th-TH',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}`;
-  renderParts(); renderReqs();
-  showToast('↻ รีเฟรชแล้ว');
+  document.getElementById('lastUpdate').textContent = `à¸­à¸±à¸à¹à¸à¸: ${now.toLocaleString('th-TH',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}`;
+  renderParts(); renderReqs(); renderJobs();
+  showToast('â» à¸£à¸µà¹à¸à¸£à¸à¹à¸¥à¹à¸§');
 }
 
-// ===== PARTS DATA (mock — แทนที่ด้วยข้อมูลจริงเมื่อตั้ง SCRIPT_URL) =====
+// ===== JOBS DATA =====
+let jobs = [];
+
+const jobStatusLabel = { pending:'à¸£à¸­à¹à¸à¹à¸ªà¸à¸­', quoted:'à¸£à¸­à¸à¸³à¸£à¸°', paid:'à¸à¸³à¸£à¸°à¹à¸¥à¹à¸§' };
+
+function renderJobs() {
+  const pending = jobs.filter(j => !j.quoteStatus || j.quoteStatus === 'pending');
+  const quoted  = jobs.filter(j => j.quoteStatus === 'quoted');
+  const paid    = jobs.filter(j => j.quoteStatus === 'paid');
+
+  document.getElementById('j-pending').textContent = pending.length;
+  document.getElementById('j-quoted').textContent  = quoted.length;
+  document.getElementById('j-paid').textContent    = paid.length;
+
+  const badgeEl = document.getElementById('badge-jobs');
+  const total = pending.length + quoted.length;
+  badgeEl.textContent = total;
+  badgeEl.style.display = total > 0 ? 'inline-block' : 'none';
+
+  function jobCard(j, showBtn) {
+    const qs = j.quoteStatus || 'pending';
+    return `<div class="job-item" id="ji-${j.id}">
+      <div class="job-top">
+        <div class="dot job-${qs}"></div>
+        <div class="job-plate">ð ${j.plate}</div>
+        <span class="badge job-${qs}">${jobStatusLabel[qs]}</span>
+        <span style="margin-left:auto;font-size:10px;color:#aaa">${j.time}</span>
+      </div>
+      <div class="job-body">
+        ð¨âð§ ${j.mechanic || '-'} &nbsp;Â·&nbsp; ð¤ ${j.customerName} &nbsp;Â·&nbsp; ð ${j.customerPhone}
+        ${j.symptoms ? '<br>ð ' + j.symptoms : ''}
+        ${j.recommendations ? '<br>ð© ' + j.recommendations : ''}
+      </div>
+      ${showBtn ? `<div class="job-actions">${jobActionBtn(j)}</div>` : ''}
+    </div>`;
+  }
+
+  function jobActionBtn(j) {
+    const qs = j.quoteStatus || 'pending';
+    if (qs === 'pending') return `<button class="action-btn btn-quote" onclick="markJobQuoted('${j.id}')">ð à¸ªà¹à¸à¹à¸à¹à¸ªà¸à¸­à¸£à¸²à¸à¸²à¹à¸¥à¹à¸§</button>`;
+    if (qs === 'quoted')  return `<button class="action-btn btn-pay"   onclick="markJobPaid('${j.id}')">ð° à¸¥à¸¹à¸à¸à¹à¸²à¹à¸­à¸à¹à¸¥à¹à¸§ â</button>`;
+    return `<button class="action-btn btn-done">â à¹à¸ªà¸£à¹à¸à¹à¸¥à¹à¸§</button>`;
+  }
+
+  document.getElementById('jobs-pending').innerHTML = pending.length
+    ? pending.map(j => jobCard(j, true)).join('')
+    : '<div class="empty-state">ð à¹à¸¡à¹à¸¡à¸µà¸£à¸²à¸¢à¸à¸²à¸£à¸£à¸­à¹à¸à¹à¸ªà¸à¸­à¸£à¸²à¸à¸²</div>';
+
+  document.getElementById('jobs-quoted').innerHTML = quoted.length
+    ? quoted.map(j => jobCard(j, true)).join('')
+    : '<div class="empty-state">à¹à¸¡à¹à¸¡à¸µà¸£à¸²à¸¢à¸à¸²à¸£à¸£à¸­à¸à¸³à¸£à¸°</div>';
+
+  document.getElementById('jobs-paid').innerHTML = paid.length
+    ? paid.map(j => jobCard(j, false)).join('')
+    : '<div class="empty-state">à¸¢à¸±à¸à¹à¸¡à¹à¸¡à¸µà¸£à¸²à¸¢à¸à¸²à¸£à¸à¸³à¸£à¸°à¸§à¸±à¸à¸à¸µà¹</div>';
+}
+
+function markJobQuoted(id) {
+  const j = jobs.find(x => x.id === id);
+  if (!j) return;
+  j.quoteStatus = 'quoted';
+  postToScript({ type: 'update', dataType: 'job', id: j.id, status: 'quoted' });
+  renderJobs();
+  showToast('ð à¸ªà¹à¸à¹à¸à¹à¸ªà¸à¸­à¸£à¸²à¸à¸²: à¸à¸°à¹à¸à¸µà¸¢à¸ ' + j.plate);
+}
+
+function markJobPaid(id) {
+  const j = jobs.find(x => x.id === id);
+  if (!j) return;
+  j.quoteStatus = 'paid';
+  postToScript({ type: 'update', dataType: 'job', id: j.id, status: 'paid' });
+  renderJobs();
+  showToast('ð° à¸¢à¸·à¸à¸¢à¸±à¸à¹à¸­à¸à¹à¸¥à¹à¸§: à¸à¸°à¹à¸à¸µà¸¢à¸ ' + j.plate);
+}
+
+// ===== PARTS DATA (mock â à¹à¸à¸à¸à¸µà¹à¸à¹à¸§à¸¢à¸à¹à¸­à¸¡à¸¹à¸¥à¸à¸£à¸´à¸à¹à¸¡à¸·à¹à¸­à¸à¸±à¹à¸ SCRIPT_URL) =====
 let parts = [
-  { id:1, code:'90793-40002', name:'น้ำมันเครื่อง 0.8L', model:'NMAX', branch:'TPR1', stock:0, urgency:'critical', note:'ลูกค้ารอ', staff:'สมชาย', time:'09:15', ordered:false },
-  { id:2, code:'5SL-E5480-00', name:'ผ้าเบรกหน้า NMAX', model:'NMAX', branch:'M2', stock:1, urgency:'critical', note:'', staff:'กิตติ', time:'09:42', ordered:false },
-  { id:3, code:'2SJ-13440-00', name:'กรองอากาศ MIO', model:'MIO', branch:'TPR2', stock:0, urgency:'critical', note:'หมดแล้ว', staff:'วิชัย', time:'08:55', ordered:false },
-  { id:4, code:'90890-04189', name:'หัวเทียน CR7E', model:'ทั่วไป', branch:'TPR1', stock:3, urgency:'low', note:'', staff:'สมชาย', time:'10:05', ordered:false },
-  { id:5, code:'5SL-E4450-00', name:'ผ้าเบรกหลัง NMAX', model:'NMAX', branch:'TPR1', stock:2, urgency:'low', note:'', staff:'อนุ', time:'10:18', ordered:false },
-  { id:6, code:'90793-40001', name:'น้ำมันเครื่อง 1L', model:'ทั่วไป', branch:'TPR2', stock:4, urgency:'normal', note:'', staff:'วิชัย', time:'07:30', ordered:true, orderedAt:'09:00' },
-  { id:7, code:'2DP-W0045-00', name:'สายสปริงคลัทช์', model:'MIO M3', branch:'TPR1', stock:2, urgency:'normal', note:'', staff:'สมชาย', time:'07:45', ordered:true, orderedAt:'09:00' },
-  { id:8, code:'5VU-14302-00', name:'หม้อกรองน้ำมัน XMAX', model:'XMAX', branch:'M2', stock:1, urgency:'low', note:'', staff:'ธนา', time:'08:00', ordered:true, orderedAt:'09:15' },
-  { id:9, code:'18P-H3508-00', name:'โซ่ตีนตะขาบ FINO', model:'FINO', branch:'TPR2', stock:0, urgency:'normal', note:'', staff:'กิตติ', time:'08:10', ordered:true, orderedAt:'09:30' },
-  { id:10, code:'1S7-12411-00', name:'ลูกสูบ MIO', model:'MIO', branch:'M2', stock:1, urgency:'low', note:'', staff:'ธนา', time:'08:30', ordered:true, orderedAt:'10:00' },
-  { id:11, code:'5SL-E4521-00', name:'คลัทช์หน้า NMAX', model:'NMAX', branch:'TPR1', stock:3, urgency:'normal', note:'', staff:'อนุ', time:'08:20', ordered:true, orderedAt:'09:30' },
+  { id:1, code:'90793-40002', name:'à¸à¹à¸³à¸¡à¸±à¸à¹à¸à¸£à¸·à¹à¸­à¸ 0.8L', model:'NMAX', branch:'TPR1', stock:0, urgency:'critical', note:'à¸¥à¸¹à¸à¸à¹à¸²à¸£à¸­', staff:'à¸ªà¸¡à¸à¸²à¸¢', time:'09:15', ordered:false },
+  { id:2, code:'5SL-E5480-00', name:'à¸à¹à¸²à¹à¸à¸£à¸à¸«à¸à¹à¸² NMAX', model:'NMAX', branch:'M2', stock:1, urgency:'critical', note:'', staff:'à¸à¸´à¸à¸à¸´', time:'09:42', ordered:false },
+  { id:3, code:'2SJ-13440-00', name:'à¸à¸£à¸­à¸à¸­à¸²à¸à¸²à¸¨ MIO', model:'MIO', branch:'TPR2', stock:0, urgency:'critical', note:'à¸«à¸¡à¸à¹à¸¥à¹à¸§', staff:'à¸§à¸´à¸à¸±à¸¢', time:'08:55', ordered:false },
+  { id:4, code:'90890-04189', name:'à¸«à¸±à¸§à¹à¸à¸µà¸¢à¸ CR7E', model:'à¸à¸±à¹à¸§à¹à¸', branch:'TPR1', stock:3, urgency:'low', note:'', staff:'à¸ªà¸¡à¸à¸²à¸¢', time:'10:05', ordered:false },
+  { id:5, code:'5SL-E4450-00', name:'à¸à¹à¸²à¹à¸à¸£à¸à¸«à¸¥à¸±à¸ NMAX', model:'NMAX', branch:'TPR1', stock:2, urgency:'low', note:'', staff:'à¸­à¸à¸¸', time:'10:18', ordered:false },
+  { id:6, code:'90793-40001', name:'à¸à¹à¸³à¸¡à¸±à¸à¹à¸à¸£à¸·à¹à¸­à¸ 1L', model:'à¸à¸±à¹à¸§à¹à¸', branch:'TPR2', stock:4, urgency:'normal', note:'', staff:'à¸§à¸´à¸à¸±à¸¢', time:'07:30', ordered:true, orderedAt:'09:00' },
+  { id:7, code:'2DP-W0045-00', name:'à¸ªà¸²à¸¢à¸ªà¸à¸£à¸´à¸à¸à¸¥à¸±à¸à¸à¹', model:'MIO M3', branch:'TPR1', stock:2, urgency:'normal', note:'', staff:'à¸ªà¸¡à¸à¸²à¸¢', time:'07:45', ordered:true, orderedAt:'09:00' },
+  { id:8, code:'5VU-14302-00', name:'à¸«à¸¡à¹à¸­à¸à¸£à¸­à¸à¸à¹à¸³à¸¡à¸±à¸ XMAX', model:'XMAX', branch:'M2', stock:1, urgency:'low', note:'', staff:'à¸à¸à¸²', time:'08:00', ordered:true, orderedAt:'09:15' },
+  { id:9, code:'18P-H3508-00', name:'à¹à¸à¹à¸à¸µà¸à¸à¸°à¸à¸²à¸ FINO', model:'FINO', branch:'TPR2', stock:0, urgency:'normal', note:'', staff:'à¸à¸´à¸à¸à¸´', time:'08:10', ordered:true, orderedAt:'09:30' },
+  { id:10, code:'1S7-12411-00', name:'à¸¥à¸¹à¸à¸ªà¸¹à¸ MIO', model:'MIO', branch:'M2', stock:1, urgency:'low', note:'', staff:'à¸à¸à¸²', time:'08:30', ordered:true, orderedAt:'10:00' },
+  { id:11, code:'5SL-E4521-00', name:'à¸à¸¥à¸±à¸à¸à¹à¸«à¸à¹à¸² NMAX', model:'NMAX', branch:'TPR1', stock:3, urgency:'normal', note:'', staff:'à¸­à¸à¸¸', time:'08:20', ordered:true, orderedAt:'09:30' },
 ];
 
 const urgOrd = { critical:0, low:1, normal:2 };
-const urgLbl = { critical:'ด่วนมาก', low:'เหลือน้อย', normal:'ใกล้หมด' };
+const urgLbl = { critical:'à¸à¹à¸§à¸à¸¡à¸²à¸', low:'à¹à¸«à¸¥à¸·à¸­à¸à¹à¸­à¸¢', normal:'à¹à¸à¸¥à¹à¸«à¸¡à¸' };
 let partsBranch = 'all';
 
 function filterParts(b, btn) {
@@ -373,7 +504,7 @@ function renderParts() {
   document.getElementById('badge-parts').textContent = parts.filter(p => !p.ordered && p.urgency==='critical').length;
 
   function stockClass(s) { return s === 0 ? 'zero' : s <= 2 ? 'low-s' : 'ok'; }
-  function stockTag(s) { return `<div class="part-qty"><div class="stock-num ${stockClass(s)}">${s}</div><div class="stock-lbl">ในสต๊อก</div></div>`; }
+  function stockTag(s) { return `<div class="part-qty"><div class="stock-num ${stockClass(s)}">${s}</div><div class="stock-lbl">à¹à¸à¸ªà¸à¹à¸­à¸</div></div>`; }
 
   const pe = document.getElementById('parts-pending');
   pe.innerHTML = pending.length ? pending.map(p => `
@@ -381,22 +512,22 @@ function renderParts() {
       <div class="dot ${p.urgency}"></div>
       <div class="part-info">
         <div class="part-name">${p.name}<span class="badge ${p.urgency}">${urgLbl[p.urgency]}</span></div>
-        <div class="part-meta">${p.code} · ${p.branch} · ${p.staff} ${p.time}${p.note?' · '+p.note:''}</div>
+        <div class="part-meta">${p.code} Â· ${p.branch} Â· ${p.staff} ${p.time}${p.note?' Â· '+p.note:''}</div>
       </div>
       ${stockTag(p.stock)}
-      <button class="action-btn btn-order" onclick="markPartOrdered(${p.id})">สั่งแล้ว ✓</button>
-    </div>`).join('') : '<div class="empty-state">🎉 ไม่มีรายการค้างสั่ง</div>';
+      <button class="action-btn btn-order" onclick="markPartOrdered(${p.id})">à¸ªà¸±à¹à¸à¹à¸¥à¹à¸§ â</button>
+    </div>`).join('') : '<div class="empty-state">ð à¹à¸¡à¹à¸¡à¸µà¸£à¸²à¸¢à¸à¸²à¸£à¸à¹à¸²à¸à¸ªà¸±à¹à¸</div>';
 
   document.getElementById('parts-ordered').innerHTML = ordered.length ? ordered.map(p => `
     <div class="part-item done">
       <div class="dot normal"></div>
       <div class="part-info">
         <div class="part-name">${p.name}</div>
-        <div class="part-meta">${p.code} · ${p.branch} · สั่ง ${p.orderedAt} น.</div>
+        <div class="part-meta">${p.code} Â· ${p.branch} Â· à¸ªà¸±à¹à¸ ${p.orderedAt} à¸.</div>
       </div>
       ${stockTag(p.stock)}
-      <button class="action-btn btn-done">✅ สั่งแล้ว</button>
-    </div>`).join('') : '<div class="empty-state">ยังไม่มีรายการสั่งวันนี้</div>';
+      <button class="action-btn btn-done">â à¸ªà¸±à¹à¸à¹à¸¥à¹à¸§</button>
+    </div>`).join('') : '<div class="empty-state">à¸¢à¸±à¸à¹à¸¡à¹à¸¡à¸µà¸£à¸²à¸¢à¸à¸²à¸£à¸ªà¸±à¹à¸à¸§à¸±à¸à¸à¸µà¹</div>';
 }
 
 function markPartOrdered(id) {
@@ -406,23 +537,23 @@ function markPartOrdered(id) {
   p.orderedAt = `${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}`;
   postToScript({ type:'update', dataType:'parts', id: p.id });
   renderParts();
-  showToast(`✅ ${p.name} – บันทึกสั่งแล้ว`);
+  showToast(`â ${p.name} â à¸à¸±à¸à¸à¸¶à¸à¸ªà¸±à¹à¸à¹à¸¥à¹à¸§`);
 }
 
 // ===== REQUISITION DATA =====
-// status: pending_r → approved → sent → received
+// status: pending_r â approved â sent â received
 let reqs = [
-  { id:1, cat:'doc', catLabel:'📄 เอกสาร', name:'บิลขายรถ (ชุด)', from:'TPR2', to:'TPR1', qty:50, note:'ลูกค้ารอ รถส่งพรุ่งนี้', staff:'มาลี', time:'09:00', status:'pending_r' },
-  { id:2, cat:'promo', catLabel:'🎁 ของแถม', name:'หมวกกันน็อค + เสื้อแจ็กเก็ต', from:'M2', to:'TPR1', qty:3, note:'ลูกค้า 3 คน รอรับ', staff:'ป้อม', time:'09:30', status:'pending_r' },
-  { id:3, cat:'promo', catLabel:'🎁 ของแถม', name:'เสื้อแจ็กเก็ต Yamaha', from:'TPR2', to:'TPR1', qty:2, note:'', staff:'วิชัย', time:'08:00', status:'sent', sentAt:'10:00' },
-  { id:4, cat:'doc', catLabel:'📄 เอกสาร', name:'ใบโอนกรรมสิทธิ์', from:'M2', to:'TPR2', qty:5, note:'', staff:'ธนา', time:'07:30', status:'received', receivedAt:'09:45' },
-  { id:5, cat:'other', catLabel:'📦 อื่นๆ', name:'แท่นวางโทรศัพท์ USB', from:'TPR2', to:'TPR1', qty:4, note:'', staff:'มาลี', time:'07:00', status:'received', receivedAt:'09:00' },
-  { id:6, cat:'promo', catLabel:'🎁 ของแถม', name:'หมวกกันน็อค NMAX', from:'M2', to:'TPR1', qty:1, note:'', staff:'ป้อม', time:'08:15', status:'received', receivedAt:'10:15' },
-  { id:7, cat:'doc', catLabel:'📄 เอกสาร', name:'สัญญาเช่าซื้อ', from:'M2', to:'TPR1', qty:10, note:'', staff:'ธนา', time:'08:45', status:'received', receivedAt:'10:30' },
+  { id:1, cat:'doc', catLabel:'ð à¹à¸­à¸à¸ªà¸²à¸£', name:'à¸à¸´à¸¥à¸à¸²à¸¢à¸£à¸ (à¸à¸¸à¸)', from:'TPR2', to:'TPR1', qty:50, note:'à¸¥à¸¹à¸à¸à¹à¸²à¸£à¸­ à¸£à¸à¸ªà¹à¸à¸à¸£à¸¸à¹à¸à¸à¸µà¹', staff:'à¸¡à¸²à¸¥à¸µ', time:'09:00', status:'pending_r' },
+  { id:2, cat:'promo', catLabel:'ð à¸à¸­à¸à¹à¸à¸¡', name:'à¸«à¸¡à¸§à¸à¸à¸±à¸à¸à¹à¸­à¸ + à¹à¸ªà¸·à¹à¸­à¹à¸à¹à¸à¹à¸à¹à¸', from:'M2', to:'TPR1', qty:3, note:'à¸¥à¸¹à¸à¸à¹à¸² 3 à¸à¸ à¸£à¸­à¸£à¸±à¸', staff:'à¸à¹à¸­à¸¡', time:'09:30', status:'pending_r' },
+  { id:3, cat:'promo', catLabel:'ð à¸à¸­à¸à¹à¸à¸¡', name:'à¹à¸ªà¸·à¹à¸­à¹à¸à¹à¸à¹à¸à¹à¸ Yamaha', from:'TPR2', to:'TPR1', qty:2, note:'', staff:'à¸§à¸´à¸à¸±à¸¢', time:'08:00', status:'sent', sentAt:'10:00' },
+  { id:4, cat:'doc', catLabel:'ð à¹à¸­à¸à¸ªà¸²à¸£', name:'à¹à¸à¹à¸­à¸à¸à¸£à¸£à¸¡à¸ªà¸´à¸à¸à¸´à¹', from:'M2', to:'TPR2', qty:5, note:'', staff:'à¸à¸à¸²', time:'07:30', status:'received', receivedAt:'09:45' },
+  { id:5, cat:'other', catLabel:'ð¦ à¸­à¸·à¹à¸à¹', name:'à¹à¸à¹à¸à¸§à¸²à¸à¹à¸à¸£à¸¨à¸±à¸à¸à¹ USB', from:'TPR2', to:'TPR1', qty:4, note:'', staff:'à¸¡à¸²à¸¥à¸µ', time:'07:00', status:'received', receivedAt:'09:00' },
+  { id:6, cat:'promo', catLabel:'ð à¸à¸­à¸à¹à¸à¸¡', name:'à¸«à¸¡à¸§à¸à¸à¸±à¸à¸à¹à¸­à¸ NMAX', from:'M2', to:'TPR1', qty:1, note:'', staff:'à¸à¹à¸­à¸¡', time:'08:15', status:'received', receivedAt:'10:15' },
+  { id:7, cat:'doc', catLabel:'ð à¹à¸­à¸à¸ªà¸²à¸£', name:'à¸ªà¸±à¸à¸à¸²à¹à¸à¹à¸²à¸à¸·à¹à¸­', from:'M2', to:'TPR1', qty:10, note:'', staff:'à¸à¸à¸²', time:'08:45', status:'received', receivedAt:'10:30' },
 ];
 
 const statusFlow = { pending_r:0, approved:1, sent:2, received:3 };
-const statusLabel = { pending_r:'รออนุมัติ', approved:'อนุมัติแล้ว', sent:'ส่งแล้ว', received:'รับแล้ว' };
+const statusLabel = { pending_r:'à¸£à¸­à¸­à¸à¸¸à¸¡à¸±à¸à¸´', approved:'à¸­à¸à¸¸à¸¡à¸±à¸à¸´à¹à¸¥à¹à¸§', sent:'à¸ªà¹à¸à¹à¸¥à¹à¸§', received:'à¸£à¸±à¸à¹à¸¥à¹à¸§' };
 let reqCat = 'all';
 
 function filterReq(c, btn) {
@@ -434,22 +565,22 @@ function filterReq(c, btn) {
 
 function stepperHTML(status) {
   const steps = ['pending_r','approved','sent','received'];
-  const icons = ['📋','✅','🚚','📬'];
-  const labels = ['ขอ','อนุมัติ','ส่ง','รับ'];
+  const icons = ['ð','â','ð','ð¬'];
+  const labels = ['à¸à¸­','à¸­à¸à¸¸à¸¡à¸±à¸à¸´','à¸ªà¹à¸','à¸£à¸±à¸'];
   const cur = statusFlow[status];
   return `<div class="stepper">${steps.map((s,i) => `
     <div class="step ${i<cur?'done':i===cur?'active':''}">
       ${i < steps.length-1 ? `<div class="step-line ${i<cur?'done':''}"></div>` : ''}
-      <div class="step-circle">${i<=cur ? (i<cur?'✓':icons[i]) : icons[i]}</div>
+      <div class="step-circle">${i<=cur ? (i<cur?'â':icons[i]) : icons[i]}</div>
       <div>${labels[i]}</div>
     </div>`).join('')}</div>`;
 }
 
 function nextAction(req) {
-  if (req.status === 'pending_r') return `<button class="action-btn btn-approve" onclick="advanceReq(${req.id},'approved')">อนุมัติ ✓</button>`;
-  if (req.status === 'approved') return `<button class="action-btn btn-sent" onclick="advanceReq(${req.id},'sent')">ส่งแล้ว 🚚</button>`;
-  if (req.status === 'sent') return `<button class="action-btn btn-recv" onclick="advanceReq(${req.id},'received')">รับแล้ว 📬</button>`;
-  return `<button class="action-btn btn-done">✅ เสร็จแล้ว</button>`;
+  if (req.status === 'pending_r') return `<button class="action-btn btn-approve" onclick="advanceReq(${req.id},'approved')">à¸­à¸à¸¸à¸¡à¸±à¸à¸´ â</button>`;
+  if (req.status === 'approved') return `<button class="action-btn btn-sent" onclick="advanceReq(${req.id},'sent')">à¸ªà¹à¸à¹à¸¥à¹à¸§ ð</button>`;
+  if (req.status === 'sent') return `<button class="action-btn btn-recv" onclick="advanceReq(${req.id},'received')">à¸£à¸±à¸à¹à¸¥à¹à¸§ ð¬</button>`;
+  return `<button class="action-btn btn-done">â à¹à¸ªà¸£à¹à¸à¹à¸¥à¹à¸§</button>`;
 }
 
 function renderReqs() {
@@ -471,21 +602,21 @@ function renderReqs() {
       </div>
       ${stepperHTML(r.status)}
       <div class="req-body">
-        <b>${r.from}</b> ขอจาก <b>${r.to}</b> · จำนวน ${r.qty} · ${r.staff} ${r.time}
-        ${r.note ? `<br>📝 ${r.note}` : ''}
+        <b>${r.from}</b> à¸à¸­à¸à¸²à¸ <b>${r.to}</b> Â· à¸à¸³à¸à¸§à¸ ${r.qty} Â· ${r.staff} ${r.time}
+        ${r.note ? `<br>ð ${r.note}` : ''}
       </div>
       <div class="req-actions">${nextAction(r)}</div>
-    </div>`).join('') : '<div class="empty-state">🎉 ไม่มีรายการรอดำเนินการ</div>';
+    </div>`).join('') : '<div class="empty-state">ð à¹à¸¡à¹à¸¡à¸µà¸£à¸²à¸¢à¸à¸²à¸£à¸£à¸­à¸à¸³à¹à¸à¸´à¸à¸à¸²à¸£</div>';
 
   document.getElementById('req-done').innerHTML = done.length ? done.map(r => `
     <div class="req-item" style="opacity:0.45">
       <div class="req-top">
         <div class="dot received"></div>
-        <div class="req-title">${r.name}<span class="badge received">รับแล้ว</span></div>
+        <div class="req-title">${r.name}<span class="badge received">à¸£à¸±à¸à¹à¸¥à¹à¸§</span></div>
         <span style="font-size:11px;color:#888">${r.catLabel}</span>
       </div>
-      <div class="req-body">${r.from} → ${r.to} · รับ ${r.receivedAt} น.</div>
-    </div>`).join('') : '<div class="empty-state">ยังไม่มีรายการเสร็จวันนี้</div>';
+      <div class="req-body">${r.from} â ${r.to} Â· à¸£à¸±à¸ ${r.receivedAt} à¸.</div>
+    </div>`).join('') : '<div class="empty-state">à¸¢à¸±à¸à¹à¸¡à¹à¸¡à¸µà¸£à¸²à¸¢à¸à¸²à¸£à¹à¸ªà¸£à¹à¸à¸§à¸±à¸à¸à¸µà¹</div>';
 }
 
 function advanceReq(id, newStatus) {
@@ -495,7 +626,7 @@ function advanceReq(id, newStatus) {
   if (newStatus==='received') r.receivedAt = now();
   postToScript({ type:'update', dataType:'req', id: r.id, status: newStatus });
   renderReqs();
-  const msgs = { approved:`✅ อนุมัติ: ${r.name}`, sent:`🚚 ส่งแล้ว: ${r.name}`, received:`📬 รับแล้ว: ${r.name}` };
+  const msgs = { approved:`â à¸­à¸à¸¸à¸¡à¸±à¸à¸´: ${r.name}`, sent:`ð à¸ªà¹à¸à¹à¸¥à¹à¸§: ${r.name}`, received:`ð¬ à¸£à¸±à¸à¹à¸¥à¹à¸§: ${r.name}` };
   showToast(msgs[newStatus]);
 }
 
@@ -506,7 +637,7 @@ function now() {
 
 // ===== TAB =====
 function switchTab(t) {
-  ['parts','req'].forEach(x => {
+  ['parts','req','jobs'].forEach(x => {
     document.getElementById('tab-'+x).classList.toggle('active', x===t);
     document.getElementById('panel-'+x).classList.toggle('active', x===t);
   });
@@ -516,21 +647,21 @@ function switchTab(t) {
 function renderChart() {
   const ctx = document.getElementById('trendChart').getContext('2d');
   const data = [
-    {name:'น้ำมันเครื่อง 0.8L',c:18},{name:'ผ้าเบรกหน้า NMAX',c:14},
-    {name:'หัวเทียน CR7E',c:12},{name:'กรองอากาศ MIO',c:11},
-    {name:'น้ำมันเครื่อง 1L',c:9},{name:'ผ้าเบรกหลัง NMAX',c:8},
-    {name:'โซ่ตีนตะขาบ FINO',c:7},{name:'คลัทช์หน้า NMAX',c:6},
-    {name:'หม้อกรองน้ำมัน XMAX',c:5},{name:'ลูกสูบ MIO',c:4},
+    {name:'à¸à¹à¸³à¸¡à¸±à¸à¹à¸à¸£à¸·à¹à¸­à¸ 0.8L',c:18},{name:'à¸à¹à¸²à¹à¸à¸£à¸à¸«à¸à¹à¸² NMAX',c:14},
+    {name:'à¸«à¸±à¸§à¹à¸à¸µà¸¢à¸ CR7E',c:12},{name:'à¸à¸£à¸­à¸à¸­à¸²à¸à¸²à¸¨ MIO',c:11},
+    {name:'à¸à¹à¸³à¸¡à¸±à¸à¹à¸à¸£à¸·à¹à¸­à¸ 1L',c:9},{name:'à¸à¹à¸²à¹à¸à¸£à¸à¸«à¸¥à¸±à¸ NMAX',c:8},
+    {name:'à¹à¸à¹à¸à¸µà¸à¸à¸°à¸à¸²à¸ FINO',c:7},{name:'à¸à¸¥à¸±à¸à¸à¹à¸«à¸à¹à¸² NMAX',c:6},
+    {name:'à¸«à¸¡à¹à¸­à¸à¸£à¸­à¸à¸à¹à¸³à¸¡à¸±à¸ XMAX',c:5},{name:'à¸¥à¸¹à¸à¸ªà¸¹à¸ MIO',c:4},
   ];
   new Chart(ctx, {
     type:'bar',
     data: {
-      labels: data.map(d => d.name.length>14 ? d.name.slice(0,14)+'…' : d.name),
+      labels: data.map(d => d.name.length>14 ? d.name.slice(0,14)+'â¦' : d.name),
       datasets:[{ data:data.map(d=>d.c), backgroundColor: data.map((_,i)=>i<3?'#e53e3e':i<6?'#dd6b20':'#3182ce'), borderRadius:4, borderSkipped:false }]
     },
     options:{
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>` ${c.raw} ครั้ง`}} },
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>` ${c.raw} à¸à¸£à¸±à¹à¸`}} },
       scales:{ x:{grid:{color:'#f5f5f5'},ticks:{font:{size:10}}}, y:{grid:{display:false},ticks:{font:{size:10}}} }
     }
   });
@@ -545,7 +676,13 @@ function showToast(msg) {
 
 renderParts();
 renderReqs();
+renderJobs();
 renderChart();
+
+// Auto-load real data on page open
+window.addEventListener('DOMContentLoaded', function() {
+  reloadAll();
+});
 </script>
 </body>
 </html>
