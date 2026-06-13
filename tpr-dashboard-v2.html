@@ -274,7 +274,7 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a1a;
   </div>
 
   <div class="filter-bar" id="req-filter">
-    <button class="filter-btn active" onclick="filterReq('all',this)">ทุกคำขอ</button>
+  # <button class="filter-btn active" onclick="filterReq('all',this)">ทุกคำขอ</button>
     <button class="filter-btn" onclick="filterReq('doc',this)">📄 เอกสาร</button>
     <button class="filter-btn" onclick="filterReq('promo',this)">🎁 ของแถม</button>
     <button class="filter-btn" onclick="filterReq('other',this)">📦 อื่นๆ</button>
@@ -374,7 +374,7 @@ async function reloadAll() {
 
   if (jobsData) {
     jobs = jobsData.map((r, i) => ({
-      id: r.id || String(i),
+      id: r.id != null ? String(r.id) : String(i),
       plate: r.plate || '',
       mechanic: r.mechanic || '',
       symptoms: r.symptoms || '',
